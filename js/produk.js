@@ -1,17 +1,17 @@
-<script>
 /* =========================================================
-   QUEEN DROPSHIP - PRODUK.JS
-   Database: server.js -> GET /api/produk
-   Tidak menggunakan localStorage
+   QUEEN DROPSHIP
+   PRODUK.JS
+   DATABASE VIA SERVER API
+   TIDAK MENGGUNAKAN LOCAL STORAGE
 ========================================================= */
 
 "use strict";
 
-/* =========================================================
-   CONFIG
-========================================================= */
-
 const API_URL = "http://localhost:3000/api/produk";
+
+let products = [];
+let editingId = null;
+
 
 /* =========================================================
    ELEMENT
@@ -21,8 +21,8 @@ const productModal = document.getElementById("productModal");
 const productForm = document.getElementById("productForm");
 
 const modalTitle = document.getElementById("modalTitle");
-const editId = document.getElementById("editId");
 
+const editIdInput = document.getElementById("editId");
 const namaInput = document.getElementById("nama");
 const skuInput = document.getElementById("sku");
 const statusInput = document.getElementById("status");
@@ -51,12 +51,6 @@ const marginPreview =
 const productTable =
     document.getElementById("productTable");
 
-const searchInput =
-    document.getElementById("search");
-
-const filterStatus =
-    document.getElementById("filterStatus");
-
 const totalProduk =
     document.getElementById("totalProduk");
 
@@ -69,30 +63,20 @@ const rataMargin =
 const jumlahHasil =
     document.getElementById("jumlahHasil");
 
-const sidebar =
-    document.getElementById("sidebar");
+const searchInput =
+    document.getElementById("search");
 
-const mobileMenu =
-    document.getElementById("mobileMenu");
-
-const currentDate =
-    document.getElementById("currentDate");
-
-
-/* =========================================================
-   DATA
-========================================================= */
-
-let produkData = [];
+const filterStatus =
+    document.getElementById("filterStatus");
 
 
 /* =========================================================
    FORMAT RUPIAH
 ========================================================= */
 
-function formatRupiah(value) {
+function formatRupiah(number) {
 
-    const number = Number(value) || 0;
+    number = Number(number) || 0;
 
     return new Intl.NumberFormat("id-ID", {
         style: "currency",
@@ -106,136 +90,400 @@ function formatRupiah(value) {
    FORMAT ANGKA
 ========================================================= */
 
-function formatNumber(value) {
+function numberValue(value) {
 
-    return new Intl.NumberFormat("id-ID", {
-        maximumFractionDigits: 0
-    }).format(Number(value) || 0);
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return 0;
+    }
 
+    return Number(value) || 0;
 }
 
 
 /* =========================================================
-   NORMALISASI DATA DATABASE
+   ESCAPE HTML
 ========================================================= */
 
-function normalizeProduct(item) {
+function escapeHTML(value) {
 
-    return {
-
-        id:
-            item.id ??
-            item.ID ??
-            "",
-
-        nama:
-            item.nama ??
-            item.name ??
-            item.nama_produk ??
-            item.product_name ??
-            "",
-
-        sku:
-            item.sku ??
-            item.SKU ??
-            "",
-
-        hargaSupplier:
-            Number(
-                item.harga_supplier ??
-                item.hargaSupplier ??
-                item.supplier_price ??
-                item.harga_beli ??
-                0
-            ),
-
-        hargaJual:
-            Number(
-                item.harga_jual ??
-                item.hargaJual ??
-                item.selling_price ??
-                0
-            ),
-
-        margin:
-            Number(
-                item.margin ??
-                item.margin_persen ??
-                item.margin_percent ??
-                0
-            ),
-
-        biayaShopee:
-            Number(
-                item.biaya_shopee ??
-                item.biayaShopee ??
-                item.shopee_fee ??
-                5000
-            ),
-
-        status:
-            item.status ??
-            "active",
-
-        deskripsi:
-            item.deskripsi ??
-            item.description ??
-            ""
-
-    };
-
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 
 /* =========================================================
-   LOAD PRODUK DARI SERVER
+   HITUNG HARGA JUAL
+=========================================================
+
+   Rumus:
+
+   Harga Supplier
+   + Margin %
+   + Pajak/Biaya Shopee Rp 5.000
+
+   Contoh:
+
+   Supplier = 35.000
+   Margin = 20%
+   Shopee = 5.000
+
+   35.000 + 7.000 + 5.000
+   = 47.000
+========================================================= */
+
+function calculateSellingPrice() {
+
+    const supplier =
+        numberValue(hargaSupplierInput.value);
+
+    const marginValue =
+        marginInput.value;
+
+    const biayaShopee =
+        numberValue(biayaShopeeInput.value);
+
+
+    /* MANUAL */
+
+    if (marginValue === "manual") {
+
+        return numberValue(
+            hargaJualInput.value
+        );
+    }
+
+
+    /* AUTO = 20% */
+
+    let marginPersen;
+
+    if (marginValue === "auto") {
+
+        marginPersen = 20;
+
+    } else {
+
+        marginPersen =
+            numberValue(marginValue);
+    }
+
+
+    const keuntunganMargin =
+        supplier * marginPersen / 100;
+
+
+    return Math.round(
+        supplier +
+        keuntunganMargin +
+        biayaShopee
+    );
+}
+
+
+/* =========================================================
+   UPDATE PREVIEW HARGA
+========================================================= */
+
+function updatePricePreview() {
+
+    const supplier =
+        numberValue(hargaSupplierInput.value);
+
+    const biayaShopee =
+        numberValue(biayaShopeeInput.value);
+
+    const marginValue =
+        marginInput.value;
+
+
+    let hargaJual =
+        calculateSellingPrice();
+
+
+    /* Kalau bukan manual, isi harga jual otomatis */
+
+    if (marginValue !== "manual") {
+
+        hargaJualInput.value =
+            hargaJual;
+    }
+
+
+    hargaJualPreview.textContent =
+        formatRupiah(hargaJual);
+
+
+    updateProfitPreview();
+}
+
+
+/* =========================================================
+   UPDATE PROFIT + MARGIN
+========================================================= */
+
+function updateProfitPreview() {
+
+    const supplier =
+        numberValue(hargaSupplierInput.value);
+
+    const jual =
+        numberValue(hargaJualInput.value);
+
+    const biayaShopee =
+        numberValue(biayaShopeeInput.value);
+
+
+    /*
+     * Keuntungan bersih:
+     *
+     * Harga jual
+     * - Harga supplier
+     * - Biaya Shopee
+     */
+
+    const profit =
+        jual -
+        supplier -
+        biayaShopee;
+
+
+    let marginPersen = 0;
+
+
+    if (supplier > 0) {
+
+        marginPersen =
+            (profit / supplier) * 100;
+    }
+
+
+    profitPreview.textContent =
+        formatRupiah(profit);
+
+
+    marginPreview.textContent =
+        `${marginPersen.toFixed(1)}%`;
+}
+
+
+/* =========================================================
+   EVENT HARGA
+========================================================= */
+
+hargaSupplierInput.addEventListener(
+    "input",
+    updatePricePreview
+);
+
+
+biayaShopeeInput.addEventListener(
+    "input",
+    updatePricePreview
+);
+
+
+marginInput.addEventListener(
+    "change",
+    function () {
+
+        if (this.value === "manual") {
+
+            hargaJualInput.removeAttribute(
+                "readonly"
+            );
+
+            hargaJualInput.focus();
+
+            updateProfitPreview();
+
+        } else {
+
+            hargaJualInput.setAttribute(
+                "readonly",
+                "readonly"
+            );
+
+            updatePricePreview();
+        }
+    }
+);
+
+
+hargaJualInput.addEventListener(
+    "input",
+    function () {
+
+        if (marginInput.value === "manual") {
+
+            updateProfitPreview();
+        }
+    }
+);
+
+
+/* =========================================================
+   OPEN MODAL
+========================================================= */
+
+window.openModal = function () {
+
+    editingId = null;
+
+    modalTitle.textContent =
+        "Tambah Produk";
+
+    productForm.reset();
+
+    editIdInput.value = "";
+
+    statusInput.value =
+        "active";
+
+    marginInput.value =
+        "20";
+
+    biayaShopeeInput.value =
+        "5000";
+
+    hargaJualInput.removeAttribute(
+        "readonly"
+    );
+
+    updatePricePreview();
+
+    productModal.classList.add(
+        "show"
+    );
+
+    setTimeout(() => {
+
+        namaInput.focus();
+
+    }, 50);
+};
+
+
+/* =========================================================
+   CLOSE MODAL
+========================================================= */
+
+window.closeModal = function () {
+
+    productModal.classList.remove(
+        "show"
+    );
+
+    editingId = null;
+};
+
+
+/* =========================================================
+   KLIK LUAR MODAL
+========================================================= */
+
+productModal.addEventListener(
+    "click",
+    function (event) {
+
+        if (
+            event.target === productModal
+        ) {
+
+            closeModal();
+        }
+    }
+);
+
+
+/* =========================================================
+   ESC UNTUK TUTUP MODAL
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (
+            event.key === "Escape" &&
+            productModal.classList.contains("show")
+        ) {
+
+            closeModal();
+        }
+    }
+);
+
+
+/* =========================================================
+   LOAD PRODUK DARI DATABASE
 ========================================================= */
 
 async function loadProducts() {
 
-    productTable.innerHTML = `
-        <tr>
-            <td colspan="7" class="empty">
-                Memuat data produk...
-            </td>
-        </tr>
-    `;
-
     try {
 
+        productTable.innerHTML = `
+            <tr>
+                <td colspan="7" class="empty">
+                    Memuat produk...
+                </td>
+            </tr>
+        `;
+
+
         const response =
-            await fetch(API_URL, {
-                method: "GET",
-                headers: {
-                    "Accept": "application/json"
-                }
-            });
+            await fetch(API_URL);
+
 
         if (!response.ok) {
 
             throw new Error(
-                "HTTP " + response.status
+                `HTTP ${response.status}`
             );
-
         }
+
 
         const data =
             await response.json();
 
-        if (!Array.isArray(data)) {
 
-            throw new Error(
-                "Format data produk tidak valid"
-            );
+        /*
+         * Server kamu mengembalikan langsung:
+         *
+         * result.rows
+         *
+         * bukan:
+         * { success:true, data:[] }
+         */
 
+        if (Array.isArray(data)) {
+
+            products = data;
+
+        } else if (
+            Array.isArray(data.data)
+        ) {
+
+            products = data.data;
+
+        } else {
+
+            products = [];
         }
 
-        produkData =
-            data.map(normalizeProduct);
 
         renderProducts();
 
         updateSummary();
+
 
     } catch (error) {
 
@@ -244,31 +492,78 @@ async function loadProducts() {
             error
         );
 
+
         productTable.innerHTML = `
             <tr>
                 <td colspan="7" class="empty">
-                    <strong>Gagal mengambil data produk.</strong>
+                    Gagal mengambil data produk.
                     <br>
-                    Pastikan server.js berjalan di
-                    <b>http://localhost:3000</b>.
-                    <br><br>
-                    <button
-                        class="btn-primary"
-                        type="button"
-                        onclick="loadProducts()">
-                        Coba Lagi
-                    </button>
+                    <small>
+                        Pastikan server.js berjalan di port 3000.
+                    </small>
                 </td>
             </tr>
         `;
-
-        totalProduk.textContent = "0";
-        produkAktif.textContent = "0";
-        rataMargin.textContent = "Rp 0";
-        jumlahHasil.textContent = "0 produk";
-
     }
+}
 
+
+/* =========================================================
+   NORMALISASI DATA DATABASE
+========================================================= */
+
+function normalizeProduct(product) {
+
+    return {
+
+        id:
+            product.id,
+
+        nama:
+            product.nama ??
+            product.name ??
+            "",
+
+        sku:
+            product.sku ??
+            "",
+
+        hargaSupplier:
+            numberValue(
+                product.harga_supplier ??
+                product.hargaSupplier ??
+                product.supplier_price
+            ),
+
+        hargaJual:
+            numberValue(
+                product.harga_jual ??
+                product.hargaJual ??
+                product.selling_price
+            ),
+
+        margin:
+            numberValue(
+                product.margin ??
+                product.margin_persen ??
+                product.marginPersen
+            ),
+
+        biayaShopee:
+            numberValue(
+                product.biaya_shopee ??
+                product.biayaShopee ??
+                product.shopee_fee
+            ),
+
+        status:
+            product.status ??
+            "active",
+
+        deskripsi:
+            product.deskripsi ??
+            ""
+    };
 }
 
 
@@ -283,33 +578,36 @@ function renderProducts() {
             .trim()
             .toLowerCase();
 
-    const selectedStatus =
+
+    const status =
         filterStatus.value;
 
+
     const filtered =
-        produkData.filter(product => {
+        products
+            .map(normalizeProduct)
+            .filter(product => {
 
-            const nama =
-                String(product.nama)
-                    .toLowerCase();
+                const cocokSearch =
+                    !keyword ||
+                    product.nama
+                        .toLowerCase()
+                        .includes(keyword) ||
+                    product.sku
+                        .toLowerCase()
+                        .includes(keyword);
 
-            const sku =
-                String(product.sku)
-                    .toLowerCase();
 
-            const cocokSearch =
-                !keyword ||
-                nama.includes(keyword) ||
-                sku.includes(keyword);
+                const cocokStatus =
+                    status === "all" ||
+                    product.status === status;
 
-            const cocokStatus =
-                selectedStatus === "all" ||
-                normalizeStatus(product.status) ===
-                selectedStatus;
 
-            return cocokSearch && cocokStatus;
-
-        });
+                return (
+                    cocokSearch &&
+                    cocokStatus
+                );
+            });
 
 
     jumlahHasil.textContent =
@@ -321,13 +619,12 @@ function renderProducts() {
         productTable.innerHTML = `
             <tr>
                 <td colspan="7" class="empty">
-                    Tidak ada produk ditemukan.
+                    Belum ada produk.
                 </td>
             </tr>
         `;
 
         return;
-
     }
 
 
@@ -335,29 +632,45 @@ function renderProducts() {
         filtered.map(product => {
 
             const supplier =
-                Number(product.hargaSupplier) || 0;
+                product.hargaSupplier;
 
             const jual =
-                Number(product.hargaJual) || 0;
+                product.hargaJual;
+
+            const biaya =
+                product.biayaShopee;
+
+
+            /*
+             * Profit bersih
+             */
 
             const profit =
-                jual - supplier;
+                jual -
+                supplier -
+                biaya;
 
-            const margin =
-                supplier > 0
-                    ? (profit / supplier) * 100
-                    : 0;
 
-            const status =
-                normalizeStatus(product.status);
+            let marginPersen = 0;
+
+
+            if (supplier > 0) {
+
+                marginPersen =
+                    (profit / supplier) * 100;
+            }
+
 
             const initial =
                 product.nama
                     ? product.nama
-                        .trim()
                         .charAt(0)
                         .toUpperCase()
-                    : "P";
+                    : "?";
+
+
+            const active =
+                product.status === "active";
 
 
             return `
@@ -375,16 +688,11 @@ function renderProducts() {
                             <div>
 
                                 <strong>
-                                    ${escapeHTML(
-                                        product.nama ||
-                                        "Tanpa Nama"
-                                    )}
+                                    ${escapeHTML(product.nama)}
                                 </strong>
 
                                 <span>
-                                    ${escapeHTML(
-                                        product.deskripsi || "-"
-                                    )}
+                                    ${escapeHTML(product.deskripsi)}
                                 </span>
 
                             </div>
@@ -395,9 +703,7 @@ function renderProducts() {
 
 
                     <td>
-                        ${escapeHTML(
-                            product.sku || "-"
-                        )}
+                        ${escapeHTML(product.sku)}
                     </td>
 
 
@@ -413,14 +719,12 @@ function renderProducts() {
 
                     <td>
 
-                        <span class="profit">
+                        <div class="profit">
                             ${formatRupiah(profit)}
-                        </span>
-
-                        <br>
+                        </div>
 
                         <span class="margin-percent">
-                            ${margin.toFixed(1)}%
+                            ${marginPersen.toFixed(1)}%
                         </span>
 
                     </td>
@@ -428,17 +732,16 @@ function renderProducts() {
 
                     <td>
 
-                        <span class="status ${
-                            status === "active"
+                        <span class="
+                            status
+                            ${active
                                 ? "active-status"
-                                : "inactive-status"
-                        }">
+                                : "inactive-status"}
+                        ">
 
-                            ${
-                                status === "active"
-                                    ? "Aktif"
-                                    : "Nonaktif"
-                            }
+                            ${active
+                                ? "Aktif"
+                                : "Nonaktif"}
 
                         </span>
 
@@ -450,9 +753,9 @@ function renderProducts() {
                         <div class="actions">
 
                             <button
-                                type="button"
                                 class="btn-edit"
-                                onclick="editProduct('${escapeAttribute(product.id)}')">
+                                type="button"
+                                onclick="editProduct(${Number(product.id)})">
 
                                 Edit
 
@@ -460,9 +763,9 @@ function renderProducts() {
 
 
                             <button
-                                type="button"
                                 class="btn-delete"
-                                onclick="deleteProduct('${escapeAttribute(product.id)}')">
+                                type="button"
+                                onclick="deleteProduct(${Number(product.id)})">
 
                                 Hapus
 
@@ -477,34 +780,6 @@ function renderProducts() {
             `;
 
         }).join("");
-
-}
-
-
-/* =========================================================
-   NORMALIZE STATUS
-========================================================= */
-
-function normalizeStatus(status) {
-
-    const value =
-        String(status || "")
-            .toLowerCase()
-            .trim();
-
-    if (
-        value === "active" ||
-        value === "aktif" ||
-        value === "true" ||
-        value === "1"
-    ) {
-
-        return "active";
-
-    }
-
-    return "inactive";
-
 }
 
 
@@ -514,317 +789,72 @@ function normalizeStatus(status) {
 
 function updateSummary() {
 
-    const total =
-        produkData.length;
+    const data =
+        products.map(normalizeProduct);
 
-    const active =
-        produkData.filter(product =>
-            normalizeStatus(product.status) === "active"
+
+    const total =
+        data.length;
+
+
+    const aktif =
+        data.filter(
+            product =>
+                product.status === "active"
         ).length;
 
 
     let totalMargin = 0;
-    let marginCount = 0;
 
 
-    produkData.forEach(product => {
+    data.forEach(product => {
 
-        const supplier =
-            Number(product.hargaSupplier) || 0;
+        if (product.hargaSupplier > 0) {
 
-        const jual =
-            Number(product.hargaJual) || 0;
+            const profit =
+                product.hargaJual -
+                product.hargaSupplier -
+                product.biayaShopee;
 
-        if (supplier > 0) {
 
             totalMargin +=
-                jual - supplier;
-
-            marginCount++;
-
+                (profit / product.hargaSupplier) * 100;
         }
-
     });
 
 
-    const average =
-        marginCount > 0
-            ? totalMargin / marginCount
+    const averageMargin =
+        total > 0
+            ? totalMargin / total
             : 0;
 
 
     totalProduk.textContent =
-        formatNumber(total);
+        total;
+
 
     produkAktif.textContent =
-        formatNumber(active);
+        aktif;
+
 
     rataMargin.textContent =
-        formatRupiah(average);
-
+        `${averageMargin.toFixed(1)}%`;
 }
 
 
 /* =========================================================
-   HITUNG HARGA JUAL
+   EDIT PRODUK
 ========================================================= */
 
-function calculateSellingPrice() {
-
-    const supplier =
-        Number(hargaSupplierInput.value) || 0;
-
-    const biaya =
-        Number(biayaShopeeInput.value) || 0;
-
-    const selectedMargin =
-        marginInput.value;
-
-
-    let hargaJual = 0;
-
-
-    /*
-     * AUTO
-     *
-     * Auto menggunakan 20%
-     */
-
-    if (selectedMargin === "auto") {
-
-        const marginPersen = 20;
-
-        hargaJual =
-            supplier +
-            (supplier * marginPersen / 100) +
-            biaya;
-
-    }
-
-
-    /*
-     * MARGIN PERSEN
-     */
-
-    else if (selectedMargin !== "manual") {
-
-        const marginPersen =
-            Number(selectedMargin) || 0;
-
-        hargaJual =
-            supplier +
-            (supplier * marginPersen / 100) +
-            biaya;
-
-    }
-
-
-    /*
-     * MANUAL
-     */
-
-    else {
-
-        hargaJual =
-            Number(hargaJualInput.value) || 0;
-
-    }
-
-
-    /*
-     * Bulatkan
-     */
-
-    hargaJual =
-        Math.round(hargaJual);
-
-
-    /*
-     * Tampilkan preview
-     */
-
-    hargaJualPreview.textContent =
-        formatRupiah(hargaJual);
-
-
-    /*
-     * Isi input harga jual
-     */
-
-    if (selectedMargin !== "manual") {
-
-        hargaJualInput.value =
-            hargaJual;
-
-    }
-
-
-    updateProfitPreview();
-
-}
-
-
-/* =========================================================
-   PREVIEW PROFIT
-========================================================= */
-
-function updateProfitPreview() {
-
-    const supplier =
-        Number(hargaSupplierInput.value) || 0;
-
-    const jual =
-        Number(hargaJualInput.value) || 0;
-
-    const profit =
-        jual - supplier;
-
-
-    let marginPersen = 0;
-
-    if (supplier > 0) {
-
-        marginPersen =
-            (profit / supplier) * 100;
-
-    }
-
-
-    profitPreview.textContent =
-        formatRupiah(profit);
-
-    marginPreview.textContent =
-        `${marginPersen.toFixed(1)}%`;
-
-    hargaJualPreview.textContent =
-        formatRupiah(jual);
-
-}
-
-
-/* =========================================================
-   UPDATE MODE MARGIN
-========================================================= */
-
-function updateMarginMode() {
-
-    const mode =
-        marginInput.value;
-
-
-    if (mode === "manual") {
-
-        hargaJualInput.removeAttribute(
-            "readonly"
-        );
-
-        hargaJualInput.focus();
-
-        updateProfitPreview();
-
-        return;
-
-    }
-
-
-    /*
-     * Persen / Auto
-     */
-
-    hargaJualInput.removeAttribute(
-        "readonly"
-    );
-
-    calculateSellingPrice();
-
-}
-
-
-/* =========================================================
-   OPEN MODAL
-========================================================= */
-
-function openModal() {
-
-    productForm.reset();
-
-    editId.value = "";
-
-    modalTitle.textContent =
-        "Tambah Produk";
-
-
-    /*
-     * Default
-     */
-
-    statusInput.value =
-        "active";
-
-    marginInput.value =
-        "20";
-
-    biayaShopeeInput.value =
-        "5000";
-
-
-    hargaSupplierInput.value =
-        "";
-
-    hargaJualInput.value =
-        "";
-
-
-    productModal.classList.add(
-        "show"
-    );
-
-
-    document.body.style.overflow =
-        "hidden";
-
-
-    setTimeout(() => {
-
-        namaInput.focus();
-
-    }, 50);
-
-
-    updateProfitPreview();
-
-    hargaJualPreview.textContent =
-        "Rp 0";
-
-}
-
-
-/* =========================================================
-   CLOSE MODAL
-========================================================= */
-
-function closeModal() {
-
-    productModal.classList.remove(
-        "show"
-    );
-
-    document.body.style.overflow =
-        "";
-
-}
-
-
-/* =========================================================
-   EDIT PRODUCT
-========================================================= */
-
-function editProduct(id) {
+window.editProduct = function (id) {
 
     const product =
-        produkData.find(item =>
-            String(item.id) === String(id)
-        );
+        products
+            .map(normalizeProduct)
+            .find(
+                item =>
+                    String(item.id) === String(id)
+            );
 
 
     if (!product) {
@@ -834,29 +864,35 @@ function editProduct(id) {
         );
 
         return;
-
     }
 
 
-    editId.value =
+    editingId =
         product.id;
+
+
+    editIdInput.value =
+        product.id;
+
 
     modalTitle.textContent =
         "Edit Produk";
 
 
     namaInput.value =
-        product.nama || "";
+        product.nama;
+
 
     skuInput.value =
-        product.sku || "";
+        product.sku;
+
 
     statusInput.value =
-        normalizeStatus(product.status);
+        product.status;
 
 
     hargaSupplierInput.value =
-        product.hargaSupplier || "";
+        product.hargaSupplier;
 
 
     biayaShopeeInput.value =
@@ -865,72 +901,338 @@ function editProduct(id) {
 
 
     /*
-     * Tentukan mode margin
+     * Cari margin yang paling sesuai
      */
 
-    const margin =
-        Number(product.margin);
+    const marginNumber =
+        product.margin;
 
 
-    const allowedMargins = [
-        10,
-        12,
-        15,
-        20,
-        21,
-        25,
-        50
+    const marginOptions = [
+        "10",
+        "12",
+        "15",
+        "20",
+        "21",
+        "25",
+        "50"
     ];
 
 
     if (
-        allowedMargins.includes(margin)
+        marginOptions.includes(
+            String(marginNumber)
+        )
     ) {
 
         marginInput.value =
-            String(margin);
+            String(marginNumber);
 
     } else {
 
         marginInput.value =
             "manual";
-
     }
 
 
     hargaJualInput.value =
-        product.hargaJual || "";
+        product.hargaJual;
 
 
-    document.getElementById(
-        "deskripsi"
-    ).value =
-        product.deskripsi || "";
+    deskripsiInput.value =
+        product.deskripsi;
+
+
+    if (
+        marginInput.value === "manual"
+    ) {
+
+        hargaJualInput.removeAttribute(
+            "readonly"
+        );
+
+    } else {
+
+        hargaJualInput.setAttribute(
+            "readonly",
+            "readonly"
+        );
+    }
+
+
+    updatePricePreview();
 
 
     productModal.classList.add(
         "show"
     );
-
-    document.body.style.overflow =
-        "hidden";
+};
 
 
-    updateMarginMode();
+/* =========================================================
+   DESKRIPSI
+========================================================= */
 
+const deskripsiInput =
+    document.getElementById("deskripsi");
+
+
+/* =========================================================
+   AMBIL DATA FORM
+========================================================= */
+
+function getFormData() {
+
+    const supplier =
+        numberValue(
+            hargaSupplierInput.value
+        );
+
+    const jual =
+        numberValue(
+            hargaJualInput.value
+        );
+
+    const biaya =
+        numberValue(
+            biayaShopeeInput.value
+        );
+
+
+    let marginPersen = 0;
+
+
+    if (
+        marginInput.value === "manual"
+    ) {
+
+        if (supplier > 0) {
+
+            marginPersen =
+                ((jual - supplier - biaya) /
+                    supplier) *
+                100;
+        }
+
+    } else if (
+        marginInput.value === "auto"
+    ) {
+
+        marginPersen = 20;
+
+    } else {
+
+        marginPersen =
+            numberValue(
+                marginInput.value
+            );
+    }
+
+
+    return {
+
+        nama:
+            namaInput.value.trim(),
+
+        sku:
+            skuInput.value.trim(),
+
+        harga_supplier:
+            supplier,
+
+        harga_jual:
+            jual,
+
+        margin:
+            Number(
+                marginPersen.toFixed(2)
+            ),
+
+        biaya_shopee:
+            biaya,
+
+        status:
+            statusInput.value,
+
+        deskripsi:
+            deskripsiInput.value.trim()
+    };
 }
 
 
 /* =========================================================
-   DELETE PRODUCT
+   SIMPAN PRODUK
 ========================================================= */
 
-async function deleteProduct(id) {
+productForm.addEventListener(
+    "submit",
+    async function (event) {
+
+        event.preventDefault();
+
+
+        const data =
+            getFormData();
+
+
+        if (!data.nama) {
+
+            alert(
+                "Nama produk wajib diisi."
+            );
+
+            return;
+        }
+
+
+        if (!data.sku) {
+
+            alert(
+                "SKU wajib diisi."
+            );
+
+            return;
+        }
+
+
+        if (
+            data.harga_supplier <= 0
+        ) {
+
+            alert(
+                "Harga supplier harus lebih dari 0."
+            );
+
+            return;
+        }
+
+
+        if (
+            data.harga_jual <= 0
+        ) {
+
+            alert(
+                "Harga jual harus lebih dari 0."
+            );
+
+            return;
+        }
+
+
+        const isEdit =
+            editingId !== null;
+
+
+        const url =
+            isEdit
+                ? `${API_URL}/${editingId}`
+                : API_URL;
+
+
+        const method =
+            isEdit
+                ? "PUT"
+                : "POST";
+
+
+        const submitButton =
+            productForm.querySelector(
+                'button[type="submit"]'
+            );
+
+
+        const originalText =
+            submitButton.textContent;
+
+
+        submitButton.disabled =
+            true;
+
+        submitButton.textContent =
+            "Menyimpan...";
+
+
+        try {
+
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method,
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+                        body:
+                            JSON.stringify(data)
+                    }
+                );
+
+
+            const result =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    result.message ||
+                    `HTTP ${response.status}`
+                );
+            }
+
+
+            alert(
+                isEdit
+                    ? "Produk berhasil diperbarui."
+                    : "Produk berhasil ditambahkan."
+            );
+
+
+            closeModal();
+
+
+            await loadProducts();
+
+
+        } catch (error) {
+
+            console.error(
+                "Gagal menyimpan produk:",
+                error
+            );
+
+
+            alert(
+                "Gagal menyimpan produk.\n\n" +
+                error.message
+            );
+
+        } finally {
+
+            submitButton.disabled =
+                false;
+
+            submitButton.textContent =
+                originalText;
+        }
+    }
+);
+
+
+/* =========================================================
+   DELETE PRODUK
+========================================================= */
+
+window.deleteProduct = async function (id) {
 
     const product =
-        produkData.find(item =>
-            String(item.id) === String(id)
-        );
+        products
+            .map(normalizeProduct)
+            .find(
+                item =>
+                    String(item.id) === String(id)
+            );
 
 
     if (!product) {
@@ -940,7 +1242,6 @@ async function deleteProduct(id) {
         );
 
         return;
-
     }
 
 
@@ -953,263 +1254,55 @@ async function deleteProduct(id) {
     if (!yakin) {
 
         return;
-
     }
 
 
-    /*
-     * Server kamu saat ini BELUM memiliki
-     * DELETE /api/produk/:id.
-     *
-     * Jangan pura-pura menghapus dari browser.
-     */
+    try {
 
-    alert(
-        "API hapus belum tersedia di server.js. " +
-        "Data database tidak diubah."
-    );
-
-}
-
-
-/* =========================================================
-   SUBMIT FORM
-========================================================= */
-
-productForm.addEventListener(
-    "submit",
-    async function(event) {
-
-        event.preventDefault();
-
-
-        const id =
-            editId.value.trim();
-
-
-        const nama =
-            namaInput.value.trim();
-
-        const sku =
-            skuInput.value.trim();
-
-        const status =
-            statusInput.value;
-
-        const hargaSupplier =
-            Number(
-                hargaSupplierInput.value
-            ) || 0;
-
-        const hargaJual =
-            Number(
-                hargaJualInput.value
-            ) || 0;
-
-        const biayaShopee =
-            Number(
-                biayaShopeeInput.value
-            ) || 0;
-
-        const deskripsi =
-            document.getElementById(
-                "deskripsi"
-            ).value.trim();
-
-
-        /*
-         * Validasi
-         */
-
-        if (!nama) {
-
-            alert(
-                "Nama produk wajib diisi."
+        const response =
+            await fetch(
+                `${API_URL}/${id}`,
+                {
+                    method: "DELETE"
+                }
             );
 
-            namaInput.focus();
 
-            return;
-
-        }
+        const result =
+            await response.json();
 
 
-        if (!sku) {
+        if (!response.ok) {
 
-            alert(
-                "SKU wajib diisi."
+            throw new Error(
+                result.message ||
+                `HTTP ${response.status}`
             );
-
-            skuInput.focus();
-
-            return;
-
         }
 
-
-        if (hargaSupplier < 0) {
-
-            alert(
-                "Harga supplier tidak valid."
-            );
-
-            return;
-
-        }
-
-
-        if (hargaJual < 0) {
-
-            alert(
-                "Harga jual tidak valid."
-            );
-
-            return;
-
-        }
-
-
-        /*
-         * Margin sebenarnya
-         */
-
-        const profit =
-            hargaJual -
-            hargaSupplier;
-
-        const marginPersen =
-            hargaSupplier > 0
-                ? (profit / hargaSupplier) * 100
-                : 0;
-
-
-        /*
-         * Payload.
-         *
-         * Nama field disiapkan mengikuti
-         * pola database Indonesia.
-         */
-
-        const payload = {
-
-            nama: nama,
-
-            sku: sku,
-
-            harga_supplier:
-                hargaSupplier,
-
-            harga_jual:
-                hargaJual,
-
-            margin:
-                Number(
-                    marginInput.value
-                ) || 0,
-
-            margin_persen:
-                Number(
-                    marginPersen.toFixed(2)
-                ),
-
-            biaya_shopee:
-                biayaShopee,
-
-            status:
-                status,
-
-            deskripsi:
-                deskripsi
-
-        };
-
-
-        /*
-         * SERVER SAAT INI BELUM PUNYA
-         * POST / PUT.
-         *
-         * Jadi jangan kirim request yang pasti 404.
-         */
 
         alert(
-            "API simpan produk belum tersedia di server.js. " +
-            "Data belum disimpan ke database."
+            "Produk berhasil dihapus."
         );
 
 
-        console.log(
-            "Payload produk yang siap dikirim:",
-            payload
+        await loadProducts();
+
+
+    } catch (error) {
+
+        console.error(
+            "Gagal menghapus produk:",
+            error
         );
 
+
+        alert(
+            "Gagal menghapus produk.\n\n" +
+            error.message
+        );
     }
-);
-
-
-/* =========================================================
-   EVENT HARGA
-========================================================= */
-
-hargaSupplierInput.addEventListener(
-    "input",
-    function() {
-
-        if (
-            marginInput.value !==
-            "manual"
-        ) {
-
-            calculateSellingPrice();
-
-        } else {
-
-            updateProfitPreview();
-
-        }
-
-    }
-);
-
-
-marginInput.addEventListener(
-    "change",
-    function() {
-
-        updateMarginMode();
-
-    }
-);
-
-
-biayaShopeeInput.addEventListener(
-    "input",
-    function() {
-
-        if (
-            marginInput.value !==
-            "manual"
-        ) {
-
-            calculateSellingPrice();
-
-        } else {
-
-            updateProfitPreview();
-
-        }
-
-    }
-);
-
-
-hargaJualInput.addEventListener(
-    "input",
-    function() {
-
-        updateProfitPreview();
-
-    }
-);
+};
 
 
 /* =========================================================
@@ -1218,11 +1311,7 @@ hargaJualInput.addEventListener(
 
 searchInput.addEventListener(
     "input",
-    function() {
-
-        renderProducts();
-
-    }
+    renderProducts
 );
 
 
@@ -1232,53 +1321,7 @@ searchInput.addEventListener(
 
 filterStatus.addEventListener(
     "change",
-    function() {
-
-        renderProducts();
-
-    }
-);
-
-
-/* =========================================================
-   CLOSE MODAL KLIK OVERLAY
-========================================================= */
-
-productModal.addEventListener(
-    "click",
-    function(event) {
-
-        if (
-            event.target ===
-            productModal
-        ) {
-
-            closeModal();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   ESC CLOSE MODAL
-========================================================= */
-
-document.addEventListener(
-    "keydown",
-    function(event) {
-
-        if (
-            event.key === "Escape" &&
-            productModal.classList.contains("show")
-        ) {
-
-            closeModal();
-
-        }
-
-    }
+    renderProducts
 );
 
 
@@ -1286,25 +1329,44 @@ document.addEventListener(
    MOBILE MENU
 ========================================================= */
 
-if (mobileMenu) {
+const mobileMenu =
+    document.getElementById(
+        "mobileMenu"
+    );
+
+
+const sidebar =
+    document.getElementById(
+        "sidebar"
+    );
+
+
+if (
+    mobileMenu &&
+    sidebar
+) {
 
     mobileMenu.addEventListener(
         "click",
-        function() {
+        function () {
 
             sidebar.classList.toggle(
                 "open"
             );
-
         }
     );
-
 }
 
 
 /* =========================================================
    DATE
 ========================================================= */
+
+const currentDate =
+    document.getElementById(
+        "currentDate"
+    );
+
 
 if (currentDate) {
 
@@ -1318,77 +1380,37 @@ if (currentDate) {
                 day: "numeric"
             }
         );
-
 }
 
 
 /* =========================================================
-   ESCAPE HTML
-========================================================= */
-
-function escapeHTML(value) {
-
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-
-}
-
-
-/* =========================================================
-   ESCAPE ATTRIBUTE
-========================================================= */
-
-function escapeAttribute(value) {
-
-    return String(value ?? "")
-        .replace(/\\/g, "\\\\")
-        .replace(/'/g, "\\'");
-
-}
-
-
-/* =========================================================
-   GLOBAL FUNCTION
-   Supaya onclick="openModal()" dari HTML bekerja.
-========================================================= */
-
-window.openModal =
-    openModal;
-
-window.closeModal =
-    closeModal;
-
-window.editProduct =
-    editProduct;
-
-window.deleteProduct =
-    deleteProduct;
-
-window.loadProducts =
-    loadProducts;
-
-
-/* =========================================================
-   START
+   INITIAL
 ========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
-    function() {
-
-        loadProducts();
+    function () {
 
         /*
-         * Set preview awal
+         * Default pajak/biaya Shopee = Rp5.000
          */
 
-        updateProfitPreview();
+        biayaShopeeInput.value =
+            biayaShopeeInput.value ||
+            "5000";
 
+
+        /*
+         * Harga jual otomatis
+         */
+
+        updatePricePreview();
+
+
+        /*
+         * Ambil data langsung dari DATABASE
+         */
+
+        loadProducts();
     }
 );
-
-</script>
