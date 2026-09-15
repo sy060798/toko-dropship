@@ -1,65 +1,21 @@
 "use strict";
 
-/*
-===========================================================
- QUEEN DROPSHIP API
-===========================================================
-
-DATABASE:
-CockroachDB / PostgreSQL
-
-ENVIRONMENT:
-DATABASE_URL
-PORT
-
-ENDPOINTS:
-
-GET    /api/ping
-GET    /api/test
-
-GET    /api/produk
-POST   /api/produk
-PUT    /api/produk/:id
-DELETE /api/produk/:id
-
-GET    /api/supplier
-POST   /api/supplier
-PUT    /api/supplier/:id
-DELETE /api/supplier/:id
-
-GET    /api/penjualan
-POST   /api/penjualan
-PUT    /api/penjualan/:id
-DELETE /api/penjualan/:id
-
-GET    /api/pembelian
-POST   /api/pembelian
-PUT    /api/pembelian/:id
-DELETE /api/pembelian/:id
-
-GET    /api/dashboard
-GET    /api/laporan
-
-===========================================================
-*/
+require("dotenv").config();
 
 const http = require("http");
 const { Pool } = require("pg");
 const { URL } = require("url");
 
 
-// =========================================================
+// ============================================================
 // CONFIG
-// =========================================================
+// ============================================================
 
 const PORT = Number(process.env.PORT) || 3000;
 
-const DATABASE_URL = process.env.DATABASE_URL;
+const DATABASE_URL =
+    process.env.DATABASE_URL;
 
-
-// =========================================================
-// VALIDASI DATABASE
-// =========================================================
 
 if (!DATABASE_URL) {
 
@@ -71,9 +27,9 @@ if (!DATABASE_URL) {
 }
 
 
-// =========================================================
+// ============================================================
 // DATABASE
-// =========================================================
+// ============================================================
 
 const pool = new Pool({
 
@@ -88,40 +44,48 @@ const pool = new Pool({
     idleTimeoutMillis: 30000,
 
     connectionTimeoutMillis: 10000
-
 });
 
 
-// =========================================================
-// HELPERS
-// =========================================================
+// ============================================================
+// JSON RESPONSE
+// ============================================================
 
-function sendJSON(res, status, data) {
+function sendJSON(
+    res,
+    status,
+    data
+) {
 
-    res.writeHead(status, {
+    res.writeHead(
+        status,
+        {
+            "Content-Type":
+                "application/json; charset=utf-8",
 
-        "Content-Type":
-            "application/json; charset=utf-8",
+            "Cache-Control":
+                "no-store",
 
-        "Cache-Control":
-            "no-store",
+            "Access-Control-Allow-Origin":
+                "*",
 
-        "Access-Control-Allow-Origin":
-            "*",
+            "Access-Control-Allow-Methods":
+                "GET,POST,PUT,DELETE,OPTIONS",
 
-        "Access-Control-Allow-Methods":
-            "GET,POST,PUT,DELETE,OPTIONS",
-
-        "Access-Control-Allow-Headers":
-            "Content-Type"
-
-    });
+            "Access-Control-Allow-Headers":
+                "Content-Type"
+        }
+    );
 
     res.end(
         JSON.stringify(data)
     );
 }
 
+
+// ============================================================
+// CLEAN
+// ============================================================
 
 function clean(value) {
 
@@ -137,7 +101,11 @@ function clean(value) {
 }
 
 
-function number(value) {
+// ============================================================
+// NUMBER
+// ============================================================
+
+function toNumber(value) {
 
     const n = Number(value);
 
@@ -150,6 +118,10 @@ function number(value) {
 }
 
 
+// ============================================================
+// REQUEST BODY
+// ============================================================
+
 function getRequestBody(req) {
 
     return new Promise(
@@ -161,7 +133,7 @@ function getRequestBody(req) {
                 "data",
                 chunk => {
 
-                    body += chunk;
+                    body += chunk.toString();
 
                     if (
                         body.length >
@@ -212,27 +184,24 @@ function getRequestBody(req) {
 
             req.on(
                 "error",
-                error => {
-
-                    reject(error);
-                }
+                reject
             );
         }
     );
 }
 
 
-// =========================================================
+// ============================================================
 // SERVER
-// =========================================================
+// ============================================================
 
 const server =
     http.createServer(
         async (req, res) => {
 
-            // =================================================
+            // ------------------------------------------------
             // CORS
-            // =================================================
+            // ------------------------------------------------
 
             res.setHeader(
                 "Access-Control-Allow-Origin",
@@ -249,15 +218,10 @@ const server =
                 "Content-Type"
             );
 
-            res.setHeader(
-                "Access-Control-Max-Age",
-                "86400"
-            );
 
-
-            // =================================================
-            // PREFLIGHT
-            // =================================================
+            // ------------------------------------------------
+            // OPTIONS
+            // ------------------------------------------------
 
             if (
                 req.method === "OPTIONS"
@@ -271,19 +235,19 @@ const server =
 
             try {
 
-                const parsedURL =
+                const parsed =
                     new URL(
                         req.url,
                         `http://${req.headers.host || "localhost"}`
                     );
 
                 const pathname =
-                    parsedURL.pathname;
+                    parsed.pathname;
 
 
-                // =================================================
+                // ====================================================
                 // PING
-                // =================================================
+                // ====================================================
 
                 if (
                     req.method === "GET" &&
@@ -306,9 +270,9 @@ const server =
                 }
 
 
-                // =================================================
+                // ====================================================
                 // DATABASE TEST
-                // =================================================
+                // ====================================================
 
                 if (
                     req.method === "GET" &&
@@ -336,9 +300,9 @@ const server =
                 }
 
 
-                // =================================================
+                // ====================================================
                 // PRODUK
-                // =================================================
+                // ====================================================
 
                 if (
                     pathname === "/api/produk"
@@ -352,7 +316,6 @@ const server =
                             res
                         );
                     }
-
 
                     if (
                         req.method === "POST"
@@ -404,9 +367,9 @@ const server =
                 }
 
 
-                // =================================================
+                // ====================================================
                 // SUPPLIER
-                // =================================================
+                // ====================================================
 
                 if (
                     pathname === "/api/supplier"
@@ -472,9 +435,9 @@ const server =
                 }
 
 
-                // =================================================
+                // ====================================================
                 // PENJUALAN
-                // =================================================
+                // ====================================================
 
                 if (
                     pathname === "/api/penjualan"
@@ -540,9 +503,9 @@ const server =
                 }
 
 
-                // =================================================
+                // ====================================================
                 // PEMBELIAN
-                // =================================================
+                // ====================================================
 
                 if (
                     pathname === "/api/pembelian"
@@ -608,9 +571,9 @@ const server =
                 }
 
 
-                // =================================================
+                // ====================================================
                 // DASHBOARD
-                // =================================================
+                // ====================================================
 
                 if (
                     req.method === "GET" &&
@@ -623,9 +586,9 @@ const server =
                 }
 
 
-                // =================================================
+                // ====================================================
                 // LAPORAN
-                // =================================================
+                // ====================================================
 
                 if (
                     req.method === "GET" &&
@@ -633,15 +596,15 @@ const server =
                 ) {
 
                     return await getLaporan(
-                        parsedURL,
+                        parsed,
                         res
                     );
                 }
 
 
-                // =================================================
+                // ====================================================
                 // 404
-                // =================================================
+                // ====================================================
 
                 return sendJSON(
                     res,
@@ -687,9 +650,9 @@ const server =
     );
 
 
-// =========================================================
+// ============================================================
 // PRODUK
-// =========================================================
+// ============================================================
 
 async function getProduk(res) {
 
@@ -716,7 +679,10 @@ async function getProduk(res) {
 }
 
 
-async function createProduk(req, res) {
+async function createProduk(
+    req,
+    res
+) {
 
     const body =
         await getRequestBody(req);
@@ -734,19 +700,19 @@ async function createProduk(req, res) {
             : "active";
 
     const hargaSupplier =
-        number(
+        toNumber(
             body.hargaSupplier ??
             body.harga_supplier
         );
 
     const hargaJual =
-        number(
+        toNumber(
             body.hargaJual ??
             body.harga_jual
         );
 
     const biayaShopee =
-        number(
+        toNumber(
             body.biayaShopee ??
             body.biaya_shopee
         );
@@ -783,7 +749,7 @@ async function createProduk(req, res) {
     }
 
 
-    const cek =
+    const check =
         await pool.query(
             `
             SELECT id
@@ -795,7 +761,9 @@ async function createProduk(req, res) {
         );
 
 
-    if (cek.rows.length) {
+    if (
+        check.rows.length > 0
+    ) {
 
         return sendJSON(
             res,
@@ -876,19 +844,19 @@ async function updateProduk(
             : "active";
 
     const hargaSupplier =
-        number(
+        toNumber(
             body.hargaSupplier ??
             body.harga_supplier
         );
 
     const hargaJual =
-        number(
+        toNumber(
             body.hargaJual ??
             body.harga_jual
         );
 
     const biayaShopee =
-        number(
+        toNumber(
             body.biayaShopee ??
             body.biaya_shopee
         );
@@ -897,13 +865,17 @@ async function updateProduk(
         clean(body.deskripsi);
 
 
-    if (!nama || !sku) {
+    if (
+        !nama ||
+        !sku
+    ) {
 
         return sendJSON(
             res,
             400,
             {
                 success: false,
+
                 message:
                     "Nama dan SKU wajib diisi."
             }
@@ -911,7 +883,7 @@ async function updateProduk(
     }
 
 
-    const cek =
+    const check =
         await pool.query(
             `
             SELECT id
@@ -920,17 +892,23 @@ async function updateProduk(
             AND id <> $2
             LIMIT 1
             `,
-            [sku, id]
+            [
+                sku,
+                id
+            ]
         );
 
 
-    if (cek.rows.length) {
+    if (
+        check.rows.length > 0
+    ) {
 
         return sendJSON(
             res,
             409,
             {
                 success: false,
+
                 message:
                     "SKU sudah digunakan produk lain."
             }
@@ -966,13 +944,16 @@ async function updateProduk(
         );
 
 
-    if (!result.rows.length) {
+    if (
+        result.rows.length === 0
+    ) {
 
         return sendJSON(
             res,
             404,
             {
                 success: false,
+
                 message:
                     "Produk tidak ditemukan."
             }
@@ -1012,13 +993,16 @@ async function deleteProduk(
         );
 
 
-    if (!result.rows.length) {
+    if (
+        result.rows.length === 0
+    ) {
 
         return sendJSON(
             res,
             404,
             {
                 success: false,
+
                 message:
                     "Produk tidak ditemukan."
             }
@@ -1042,9 +1026,9 @@ async function deleteProduk(
 }
 
 
-// =========================================================
+// ============================================================
 // SUPPLIER
-// =========================================================
+// ============================================================
 
 async function getSupplier(res) {
 
@@ -1063,7 +1047,10 @@ async function getSupplier(res) {
 }
 
 
-async function createSupplier(req, res) {
+async function createSupplier(
+    req,
+    res
+) {
 
     const body =
         await getRequestBody(req);
@@ -1100,6 +1087,7 @@ async function createSupplier(req, res) {
             400,
             {
                 success: false,
+
                 message:
                     "Nama supplier wajib diisi."
             }
@@ -1206,13 +1194,16 @@ async function updateSupplier(
         );
 
 
-    if (!result.rows.length) {
+    if (
+        result.rows.length === 0
+    ) {
 
         return sendJSON(
             res,
             404,
             {
                 success: false,
+
                 message:
                     "Supplier tidak ditemukan."
             }
@@ -1252,13 +1243,16 @@ async function deleteSupplier(
         );
 
 
-    if (!result.rows.length) {
+    if (
+        result.rows.length === 0
+    ) {
 
         return sendJSON(
             res,
             404,
             {
                 success: false,
+
                 message:
                     "Supplier tidak ditemukan."
             }
@@ -1282,9 +1276,9 @@ async function deleteSupplier(
 }
 
 
-// =========================================================
+// ============================================================
 // PENJUALAN
-// =========================================================
+// ============================================================
 
 async function getPenjualan(res) {
 
@@ -1313,23 +1307,25 @@ async function createPenjualan(
 
 
     const produkId =
-        number(
+        toNumber(
             body.produk_id ??
             body.produkId
         );
 
     const jumlah =
-        number(body.jumlah);
+        toNumber(
+            body.jumlah
+        );
 
     const hargaJual =
-        number(
+        toNumber(
             body.harga_jual ??
             body.hargaJual
         );
 
     const total =
         body.total !== undefined
-            ? number(body.total)
+            ? toNumber(body.total)
             : jumlah * hargaJual;
 
     const tanggal =
@@ -1345,6 +1341,7 @@ async function createPenjualan(
             400,
             {
                 success: false,
+
                 message:
                     "Produk wajib dipilih."
             }
@@ -1352,13 +1349,16 @@ async function createPenjualan(
     }
 
 
-    if (jumlah <= 0) {
+    if (
+        jumlah <= 0
+    ) {
 
         return sendJSON(
             res,
             400,
             {
                 success: false,
+
                 message:
                     "Jumlah penjualan tidak valid."
             }
@@ -1418,23 +1418,25 @@ async function updatePenjualan(
 
 
     const produkId =
-        number(
+        toNumber(
             body.produk_id ??
             body.produkId
         );
 
     const jumlah =
-        number(body.jumlah);
+        toNumber(
+            body.jumlah
+        );
 
     const hargaJual =
-        number(
+        toNumber(
             body.harga_jual ??
             body.hargaJual
         );
 
     const total =
         body.total !== undefined
-            ? number(body.total)
+            ? toNumber(body.total)
             : jumlah * hargaJual;
 
     const tanggal =
@@ -1467,13 +1469,16 @@ async function updatePenjualan(
         );
 
 
-    if (!result.rows.length) {
+    if (
+        result.rows.length === 0
+    ) {
 
         return sendJSON(
             res,
             404,
             {
                 success: false,
+
                 message:
                     "Penjualan tidak ditemukan."
             }
@@ -1513,13 +1518,16 @@ async function deletePenjualan(
         );
 
 
-    if (!result.rows.length) {
+    if (
+        result.rows.length === 0
+    ) {
 
         return sendJSON(
             res,
             404,
             {
                 success: false,
+
                 message:
                     "Penjualan tidak ditemukan."
             }
@@ -1543,9 +1551,9 @@ async function deletePenjualan(
 }
 
 
-// =========================================================
+// ============================================================
 // PEMBELIAN
-// =========================================================
+// ============================================================
 
 async function getPembelian(res) {
 
@@ -1574,29 +1582,31 @@ async function createPembelian(
 
 
     const produkId =
-        number(
+        toNumber(
             body.produk_id ??
             body.produkId
         );
 
     const supplierId =
-        number(
+        toNumber(
             body.supplier_id ??
             body.supplierId
         );
 
     const jumlah =
-        number(body.jumlah);
+        toNumber(
+            body.jumlah
+        );
 
     const hargaBeli =
-        number(
+        toNumber(
             body.harga_beli ??
             body.hargaBeli
         );
 
     const total =
         body.total !== undefined
-            ? number(body.total)
+            ? toNumber(body.total)
             : jumlah * hargaBeli;
 
     const tanggal =
@@ -1612,6 +1622,7 @@ async function createPembelian(
             400,
             {
                 success: false,
+
                 message:
                     "Produk wajib dipilih."
             }
@@ -1619,13 +1630,16 @@ async function createPembelian(
     }
 
 
-    if (jumlah <= 0) {
+    if (
+        jumlah <= 0
+    ) {
 
         return sendJSON(
             res,
             400,
             {
                 success: false,
+
                 message:
                     "Jumlah pembelian tidak valid."
             }
@@ -1687,29 +1701,31 @@ async function updatePembelian(
 
 
     const produkId =
-        number(
+        toNumber(
             body.produk_id ??
             body.produkId
         );
 
     const supplierId =
-        number(
+        toNumber(
             body.supplier_id ??
             body.supplierId
         );
 
     const jumlah =
-        number(body.jumlah);
+        toNumber(
+            body.jumlah
+        );
 
     const hargaBeli =
-        number(
+        toNumber(
             body.harga_beli ??
             body.hargaBeli
         );
 
     const total =
         body.total !== undefined
-            ? number(body.total)
+            ? toNumber(body.total)
             : jumlah * hargaBeli;
 
     const tanggal =
@@ -1744,13 +1760,16 @@ async function updatePembelian(
         );
 
 
-    if (!result.rows.length) {
+    if (
+        result.rows.length === 0
+    ) {
 
         return sendJSON(
             res,
             404,
             {
                 success: false,
+
                 message:
                     "Pembelian tidak ditemukan."
             }
@@ -1790,13 +1809,16 @@ async function deletePembelian(
         );
 
 
-    if (!result.rows.length) {
+    if (
+        result.rows.length === 0
+    ) {
 
         return sendJSON(
             res,
             404,
             {
                 success: false,
+
                 message:
                     "Pembelian tidak ditemukan."
             }
@@ -1820,9 +1842,9 @@ async function deletePembelian(
 }
 
 
-// =========================================================
+// ============================================================
 // DASHBOARD
-// =========================================================
+// ============================================================
 
 async function getDashboard(res) {
 
@@ -1923,9 +1945,9 @@ async function getDashboard(res) {
 }
 
 
-// =========================================================
+// ============================================================
 // LAPORAN
-// =========================================================
+// ============================================================
 
 async function getLaporan(
     parsedURL,
@@ -1990,12 +2012,16 @@ async function getLaporan(
                 `
                 SELECT
                     COUNT(*)::int AS transaksi,
+
                     COALESCE(
                         SUM(total),
                         0
                     ) AS total
+
                 FROM penjualan
+
                 WHERE 1 = 1
+
                 ${kondisiPenjualan}
                 `,
                 paramsPenjualan
@@ -2005,12 +2031,16 @@ async function getLaporan(
                 `
                 SELECT
                     COUNT(*)::int AS transaksi,
+
                     COALESCE(
                         SUM(total),
                         0
                     ) AS total
+
                 FROM pembelian
+
                 WHERE 1 = 1
+
                 ${kondisiPembelian}
                 `,
                 paramsPembelian
@@ -2081,9 +2111,9 @@ async function getLaporan(
 }
 
 
-// =========================================================
-// DATABASE TEST
-// =========================================================
+// ============================================================
+// DATABASE CONNECTION TEST
+// ============================================================
 
 async function testDatabase() {
 
@@ -2112,9 +2142,9 @@ async function testDatabase() {
 }
 
 
-// =========================================================
-// START SERVER
-// =========================================================
+// ============================================================
+// START
+// ============================================================
 
 server.listen(
     PORT,
@@ -2171,9 +2201,9 @@ GET /api/laporan
 );
 
 
-// =========================================================
+// ============================================================
 // DATABASE POOL ERROR
-// =========================================================
+// ============================================================
 
 pool.on(
     "error",
@@ -2187,9 +2217,9 @@ pool.on(
 );
 
 
-// =========================================================
-// GRACEFUL SHUTDOWN
-// =========================================================
+// ============================================================
+// SHUTDOWN
+// ============================================================
 
 async function shutdown() {
 
@@ -2215,7 +2245,6 @@ async function shutdown() {
                 );
             }
 
-
             process.exit(0);
         }
     );
@@ -2226,7 +2255,6 @@ process.on(
     "SIGTERM",
     shutdown
 );
-
 
 process.on(
     "SIGINT",
