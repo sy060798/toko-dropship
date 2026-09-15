@@ -1,52 +1,62 @@
+<script>
+
 /* =====================================================
-   QUEEN DROPSHIP
-   JAVASCRIPT PEMBELIAN
+   CONFIG
 ===================================================== */
+
+const PURCHASE_KEY = "queen_purchases";
 
 
 /* =====================================================
    DATA PEMBELIAN
 ===================================================== */
 
-let purchases =
-    JSON.parse(
-        localStorage.getItem("queen_purchases")
-    ) || [
+let purchases = loadPurchases();
 
-        {
-            id: 1,
-            tanggal: "2026-09-14",
-            produk: "Kaos Basic",
-            supplier: "Supplier Fashion Jakarta",
-            order: "ORD-001",
-            qty: 2,
-            hargaBeli: 35000,
-            status: "selesai"
-        },
 
-        {
-            id: 2,
-            tanggal: "2026-09-14",
-            produk: "Tumbler Stainless",
-            supplier: "Tumbler Store",
-            order: "ORD-002",
-            qty: 1,
-            hargaBeli: 40000,
-            status: "selesai"
-        },
+/* =====================================================
+   LOAD DATA
+===================================================== */
 
-        {
-            id: 3,
-            tanggal: "2026-09-15",
-            produk: "Botol Minum",
-            supplier: "Grosir Online",
-            order: "ORD-003",
-            qty: 3,
-            hargaBeli: 28000,
-            status: "proses"
-        }
+function loadPurchases() {
 
-    ];
+    try {
+
+        const data =
+            JSON.parse(
+                localStorage.getItem(PURCHASE_KEY)
+            );
+
+        return Array.isArray(data)
+            ? data
+            : [];
+
+    } catch (error) {
+
+        console.error(
+            "Gagal membaca data pembelian:",
+            error
+        );
+
+        return [];
+
+    }
+
+}
+
+
+/* =====================================================
+   SIMPAN DATA
+===================================================== */
+
+function savePurchases() {
+
+    localStorage.setItem(
+        PURCHASE_KEY,
+        JSON.stringify(purchases)
+    );
+
+}
 
 
 /* =====================================================
@@ -70,20 +80,6 @@ function rupiah(number) {
 
 
 /* =====================================================
-   SIMPAN DATA
-===================================================== */
-
-function savePurchases() {
-
-    localStorage.setItem(
-        "queen_purchases",
-        JSON.stringify(purchases)
-    );
-
-}
-
-
-/* =====================================================
    FORMAT TANGGAL
 ===================================================== */
 
@@ -94,13 +90,17 @@ function formatTanggal(date) {
     }
 
     const parsedDate =
-        new Date(
-            date + "T00:00:00"
-        );
+        new Date(date + "T00:00:00");
 
-    if (isNaN(parsedDate.getTime())) {
+
+    if (
+        isNaN(
+            parsedDate.getTime()
+        )
+    ) {
         return "-";
     }
+
 
     return parsedDate.toLocaleDateString(
         "id-ID",
@@ -116,33 +116,27 @@ function formatTanggal(date) {
 
 /* =====================================================
    ESCAPE HTML
-   Supaya input user aman ditampilkan ke tabel
 ===================================================== */
 
 function escapeHtml(value) {
 
     return String(value ?? "")
-
         .replace(
             /&/g,
             "&amp;"
         )
-
         .replace(
             /</g,
             "&lt;"
         )
-
         .replace(
             />/g,
             "&gt;"
         )
-
         .replace(
             /"/g,
             "&quot;"
         )
-
         .replace(
             /'/g,
             "&#039;"
@@ -152,180 +146,27 @@ function escapeHtml(value) {
 
 
 /* =====================================================
-   NORMALISASI DATA
+   TANGGAL HARI INI
 ===================================================== */
 
-function normalizePurchase(item) {
+function getToday() {
 
-    return {
+    const now = new Date();
 
-        id:
-            item.id,
+    const year =
+        now.getFullYear();
 
-        tanggal:
-            item.tanggal ||
-            "",
+    const month =
+        String(
+            now.getMonth() + 1
+        ).padStart(2, "0");
 
-        produk:
-            String(
-                item.produk ||
-                ""
-            ),
+    const day =
+        String(
+            now.getDate()
+        ).padStart(2, "0");
 
-        supplier:
-            String(
-                item.supplier ||
-                ""
-            ),
-
-        order:
-            String(
-                item.order ||
-                ""
-            ),
-
-        qty:
-            Number(
-                item.qty
-            ) || 0,
-
-        hargaBeli:
-            Number(
-                item.hargaBeli
-            ) || 0,
-
-        status:
-            item.status ||
-            "proses"
-
-    };
-
-}
-
-
-/* =====================================================
-   STATUS HTML
-===================================================== */
-
-function getStatusHTML(status) {
-
-    if (status === "selesai") {
-
-        return `
-            <span class="status success-status">
-                Selesai
-            </span>
-        `;
-
-    }
-
-
-    if (status === "proses") {
-
-        return `
-            <span class="status process-status">
-                Diproses
-            </span>
-        `;
-
-    }
-
-
-    if (status === "batal") {
-
-        return `
-            <span class="status cancel-status">
-                Batal
-            </span>
-        `;
-
-    }
-
-
-    return `
-        <span class="status process-status">
-            Diproses
-        </span>
-    `;
-
-}
-
-
-/* =====================================================
-   GET FILTERED DATA
-===================================================== */
-
-function getFilteredPurchases() {
-
-    const searchElement =
-        document.getElementById(
-            "search"
-        );
-
-
-    const statusElement =
-        document.getElementById(
-            "filterStatus"
-        );
-
-
-    const search =
-        searchElement
-            ? searchElement.value
-                .trim()
-                .toLowerCase()
-            : "";
-
-
-    const filterStatus =
-        statusElement
-            ? statusElement.value
-            : "all";
-
-
-    const filtered =
-        purchases
-            .map(normalizePurchase)
-            .filter(item => {
-
-                const produk =
-                    item.produk
-                        .toLowerCase();
-
-                const supplier =
-                    item.supplier
-                        .toLowerCase();
-
-                const order =
-                    item.order
-                        .toLowerCase();
-
-
-                const cocokSearch =
-
-                    produk.includes(search) ||
-
-                    supplier.includes(search) ||
-
-                    order.includes(search);
-
-
-                const cocokStatus =
-
-                    filterStatus === "all" ||
-
-                    item.status === filterStatus;
-
-
-                return (
-                    cocokSearch &&
-                    cocokStatus
-                );
-
-            });
-
-
-    return filtered;
+    return `${year}-${month}-${day}`;
 
 }
 
@@ -342,20 +183,70 @@ function renderPurchases() {
         );
 
 
-    if (!table) {
-        return;
-    }
+    const search =
+        document.getElementById(
+            "search"
+        )
+        .value
+        .trim()
+        .toLowerCase();
+
+
+    const filter =
+        document.getElementById(
+            "filterStatus"
+        )
+        .value;
 
 
     const filtered =
-        getFilteredPurchases();
+        purchases.filter(item => {
+
+            const produk =
+                String(
+                    item.produk || ""
+                )
+                .toLowerCase();
+
+
+            const supplier =
+                String(
+                    item.supplier || ""
+                )
+                .toLowerCase();
+
+
+            const order =
+                String(
+                    item.order || ""
+                )
+                .toLowerCase();
+
+
+            const matchSearch =
+                produk.includes(search) ||
+                supplier.includes(search) ||
+                order.includes(search);
+
+
+            const matchStatus =
+                filter === "all" ||
+                item.status === filter;
+
+
+            return (
+                matchSearch &&
+                matchStatus
+            );
+
+        });
 
 
     table.innerHTML = "";
 
 
     /* =================================================
-       EMPTY DATA
+       EMPTY
     ================================================= */
 
     if (filtered.length === 0) {
@@ -376,49 +267,93 @@ function renderPurchases() {
 
         `;
 
-        updateSummary(filtered);
-
-        return;
-
     }
 
 
     /* =================================================
-       RENDER DATA
+       TABLE DATA
     ================================================= */
 
     filtered.forEach(item => {
 
+        const qty =
+            Number(item.qty) || 0;
+
+
+        const hargaBeli =
+            Number(item.hargaBeli) || 0;
+
+
         const total =
-            item.qty *
-            item.hargaBeli;
+            qty * hargaBeli;
+
+
+        const produk =
+            String(
+                item.produk || ""
+            );
 
 
         const firstLetter =
-            item.produk
-                .trim()
+            produk
                 .charAt(0)
-                .toUpperCase() || "P";
+                .toUpperCase();
 
 
-        const statusHTML =
-            getStatusHTML(
-                item.status
-            );
+        let statusHTML = "";
+
+
+        if (
+            item.status === "selesai"
+        ) {
+
+            statusHTML = `
+
+                <span class="status success-status">
+                    Selesai
+                </span>
+
+            `;
+
+        }
+
+        else if (
+            item.status === "proses"
+        ) {
+
+            statusHTML = `
+
+                <span class="status process-status">
+                    Diproses
+                </span>
+
+            `;
+
+        }
+
+        else if (
+            item.status === "batal"
+        ) {
+
+            statusHTML = `
+
+                <span class="status cancel-status">
+                    Batal
+                </span>
+
+            `;
+
+        }
 
 
         table.innerHTML += `
 
             <tr>
 
-                <!-- TANGGAL -->
-
                 <td>
                     ${formatTanggal(item.tanggal)}
                 </td>
 
-
-                <!-- PRODUK -->
 
                 <td>
 
@@ -431,7 +366,7 @@ function renderPurchases() {
                         <div>
 
                             <strong>
-                                ${escapeHtml(item.produk)}
+                                ${escapeHtml(produk)}
                             </strong>
 
                             <span>
@@ -445,49 +380,35 @@ function renderPurchases() {
                 </td>
 
 
-                <!-- SUPPLIER -->
-
                 <td>
                     ${escapeHtml(item.supplier)}
                 </td>
 
-
-                <!-- ORDER -->
 
                 <td>
                     ${escapeHtml(item.order)}
                 </td>
 
 
-                <!-- QTY -->
-
                 <td>
-                    ${item.qty}
+                    ${qty}
                 </td>
 
-
-                <!-- HARGA BELI -->
 
                 <td class="money">
-                    ${rupiah(item.hargaBeli)}
+                    ${rupiah(hargaBeli)}
                 </td>
 
-
-                <!-- TOTAL MODAL -->
 
                 <td class="money">
                     ${rupiah(total)}
                 </td>
 
 
-                <!-- STATUS -->
-
                 <td>
                     ${statusHTML}
                 </td>
 
-
-                <!-- AKSI -->
 
                 <td>
 
@@ -523,49 +444,48 @@ function renderPurchases() {
     });
 
 
-    updateSummary(
-        filtered
-    );
+    updateSummary(filtered);
 
 }
 
 
 /* =====================================================
-   UPDATE SUMMARY
+   SUMMARY
 ===================================================== */
 
 function updateSummary(filtered) {
 
     let totalPembelian = 0;
-
     let totalQty = 0;
-
     let totalTransaksi = 0;
 
 
     filtered.forEach(item => {
 
         /*
-           Pembelian batal tidak dihitung
-           sebagai modal aktif.
-        */
+         * Pembelian batal tidak dihitung.
+         */
 
         if (
             item.status === "batal"
         ) {
-
             return;
-
         }
 
 
-        totalQty +=
-            item.qty;
+        const qty =
+            Number(item.qty) || 0;
+
+
+        const hargaBeli =
+            Number(item.hargaBeli) || 0;
+
+
+        totalQty += qty;
 
 
         totalPembelian +=
-            item.qty *
-            item.hargaBeli;
+            qty * hargaBeli;
 
 
         totalTransaksi++;
@@ -573,75 +493,37 @@ function updateSummary(filtered) {
     });
 
 
-    const totalPembelianElement =
-        document.getElementById(
-            "totalPembelian"
-        );
+    document.getElementById(
+        "totalPembelian"
+    ).textContent =
+        rupiah(totalPembelian);
 
 
-    const totalQtyElement =
-        document.getElementById(
-            "totalQty"
-        );
+    document.getElementById(
+        "totalQty"
+    ).textContent =
+        totalQty;
 
 
-    const totalTransaksiElement =
-        document.getElementById(
-            "totalTransaksi"
-        );
+    document.getElementById(
+        "totalTransaksi"
+    ).textContent =
+        totalTransaksi;
 
 
-    const jumlahHasilElement =
-        document.getElementById(
-            "jumlahHasil"
-        );
-
-
-    if (totalPembelianElement) {
-
-        totalPembelianElement.textContent =
-            rupiah(totalPembelian);
-
-    }
-
-
-    if (totalQtyElement) {
-
-        totalQtyElement.textContent =
-            totalQty;
-
-    }
-
-
-    if (totalTransaksiElement) {
-
-        totalTransaksiElement.textContent =
-            totalTransaksi;
-
-    }
-
-
-    if (jumlahHasilElement) {
-
-        jumlahHasilElement.textContent =
-            `${filtered.length} transaksi`;
-
-    }
+    document.getElementById(
+        "jumlahHasil"
+    ).textContent =
+        `${filtered.length} transaksi`;
 
 }
 
 
 /* =====================================================
-   OPEN MODAL TAMBAH
+   OPEN MODAL
 ===================================================== */
 
 function openModal() {
-
-    const modal =
-        document.getElementById(
-            "purchaseModal"
-        );
-
 
     const form =
         document.getElementById(
@@ -649,125 +531,40 @@ function openModal() {
         );
 
 
-    const title =
-        document.getElementById(
-            "modalTitle"
-        );
-
-
-    const editId =
-        document.getElementById(
-            "editId"
-        );
-
-
-    if (!modal || !form) {
-        return;
-    }
-
-
     form.reset();
 
 
-    if (title) {
-
-        title.textContent =
-            "Tambah Pembelian";
-
-    }
+    document.getElementById(
+        "editId"
+    ).value = "";
 
 
-    if (editId) {
-
-        editId.value = "";
-
-    }
-
-
-    const tanggal =
-        document.getElementById(
-            "tanggal"
-        );
+    document.getElementById(
+        "modalTitle"
+    ).textContent =
+        "Tambah Pembelian";
 
 
-    if (tanggal) {
-
-        const today =
-            new Date();
-
-
-        const year =
-            today.getFullYear();
+    document.getElementById(
+        "tanggal"
+    ).value =
+        getToday();
 
 
-        const month =
-            String(
-                today.getMonth() + 1
-            ).padStart(
-                2,
-                "0"
-            );
+    document.getElementById(
+        "qty"
+    ).value = 1;
 
 
-        const day =
-            String(
-                today.getDate()
-            ).padStart(
-                2,
-                "0"
-            );
+    document.getElementById(
+        "status"
+    ).value =
+        "proses";
 
 
-        tanggal.value =
-            `${year}-${month}-${day}`;
-
-    }
-
-
-    const qty =
-        document.getElementById(
-            "qty"
-        );
-
-
-    if (qty) {
-
-        qty.value = 1;
-
-    }
-
-
-    const status =
-        document.getElementById(
-            "status"
-        );
-
-
-    if (status) {
-
-        status.value =
-            "proses";
-
-    }
-
-
-    modal.classList.add(
-        "show"
-    );
-
-
-    setTimeout(() => {
-
-        const produk =
-            document.getElementById(
-                "produk"
-            );
-
-        if (produk) {
-            produk.focus();
-        }
-
-    }, 100);
+    document.getElementById(
+        "purchaseModal"
+    ).classList.add("show");
 
 }
 
@@ -778,60 +575,9 @@ function openModal() {
 
 function closeModal() {
 
-    const modal =
-        document.getElementById(
-            "purchaseModal"
-        );
-
-
-    if (!modal) {
-        return;
-    }
-
-
-    modal.classList.remove(
-        "show"
-    );
-
-
-    const form =
-        document.getElementById(
-            "purchaseForm"
-        );
-
-
-    if (form) {
-
-        form.reset();
-
-    }
-
-
-    const editId =
-        document.getElementById(
-            "editId"
-        );
-
-
-    if (editId) {
-
-        editId.value = "";
-
-    }
-
-
-    const title =
-        document.getElementById(
-            "modalTitle"
-        );
-
-
-    if (title) {
-
-        title.textContent =
-            "Tambah Pembelian";
-
-    }
+    document.getElementById(
+        "purchaseModal"
+    ).classList.remove("show");
 
 }
 
@@ -851,171 +597,73 @@ function editPurchase(id) {
 
 
     if (!item) {
-
-        alert(
-            "Data pembelian tidak ditemukan."
-        );
-
-        return;
-
-    }
-
-
-    const modal =
-        document.getElementById(
-            "purchaseModal"
-        );
-
-
-    if (!modal) {
         return;
     }
 
 
-    const title =
-        document.getElementById(
-            "modalTitle"
-        );
+    document.getElementById(
+        "purchaseModal"
+    ).classList.add("show");
 
 
-    const editId =
-        document.getElementById(
-            "editId"
-        );
+    document.getElementById(
+        "modalTitle"
+    ).textContent =
+        "Edit Pembelian";
 
 
-    const tanggal =
-        document.getElementById(
-            "tanggal"
-        );
+    document.getElementById(
+        "editId"
+    ).value =
+        item.id;
 
 
-    const produk =
-        document.getElementById(
-            "produk"
-        );
+    document.getElementById(
+        "tanggal"
+    ).value =
+        item.tanggal || "";
 
 
-    const supplier =
-        document.getElementById(
-            "supplier"
-        );
+    document.getElementById(
+        "produk"
+    ).value =
+        item.produk || "";
 
 
-    const order =
-        document.getElementById(
-            "order"
-        );
+    document.getElementById(
+        "supplier"
+    ).value =
+        item.supplier || "";
 
 
-    const qty =
-        document.getElementById(
-            "qty"
-        );
+    document.getElementById(
+        "order"
+    ).value =
+        item.order || "";
 
 
-    const hargaBeli =
-        document.getElementById(
-            "hargaBeli"
-        );
+    document.getElementById(
+        "qty"
+    ).value =
+        item.qty || 1;
 
 
-    const status =
-        document.getElementById(
-            "status"
-        );
+    document.getElementById(
+        "hargaBeli"
+    ).value =
+        item.hargaBeli || 0;
 
 
-    if (title) {
-
-        title.textContent =
-            "Edit Pembelian";
-
-    }
-
-
-    if (editId) {
-
-        editId.value =
-            item.id;
-
-    }
-
-
-    if (tanggal) {
-
-        tanggal.value =
-            item.tanggal || "";
-
-    }
-
-
-    if (produk) {
-
-        produk.value =
-            item.produk || "";
-
-    }
-
-
-    if (supplier) {
-
-        supplier.value =
-            item.supplier || "";
-
-    }
-
-
-    if (order) {
-
-        order.value =
-            item.order || "";
-
-    }
-
-
-    if (qty) {
-
-        qty.value =
-            item.qty || 1;
-
-    }
-
-
-    if (hargaBeli) {
-
-        hargaBeli.value =
-            item.hargaBeli || 0;
-
-    }
-
-
-    if (status) {
-
-        status.value =
-            item.status || "proses";
-
-    }
-
-
-    modal.classList.add(
-        "show"
-    );
-
-
-    setTimeout(() => {
-
-        if (produk) {
-            produk.focus();
-        }
-
-    }, 100);
+    document.getElementById(
+        "status"
+    ).value =
+        item.status || "proses";
 
 }
 
 
 /* =====================================================
-   HAPUS PEMBELIAN
+   DELETE PEMBELIAN
 ===================================================== */
 
 function deletePurchase(id) {
@@ -1029,13 +677,7 @@ function deletePurchase(id) {
 
 
     if (!item) {
-
-        alert(
-            "Data pembelian tidak ditemukan."
-        );
-
         return;
-
     }
 
 
@@ -1066,27 +708,19 @@ function deletePurchase(id) {
 
 
 /* =====================================================
-   SUBMIT FORM PEMBELIAN
+   SUBMIT FORM
 ===================================================== */
 
-const purchaseForm =
-    document.getElementById(
+document
+    .getElementById(
         "purchaseForm"
-    );
-
-
-if (purchaseForm) {
-
-    purchaseForm.addEventListener(
+    )
+    .addEventListener(
         "submit",
         function(event) {
 
             event.preventDefault();
 
-
-            /* =========================================
-               AMBIL INPUT
-            ========================================= */
 
             const editId =
                 document.getElementById(
@@ -1143,75 +777,23 @@ if (purchaseForm) {
                 ).value;
 
 
-            /* =========================================
+            /* =============================================
                VALIDASI
-            ========================================= */
-
-            if (!tanggal) {
-
-                alert(
-                    "Tanggal pembelian wajib diisi."
-                );
-
-                return;
-
-            }
-
-
-            if (!produk) {
-
-                alert(
-                    "Nama produk wajib diisi."
-                );
-
-                return;
-
-            }
-
-
-            if (!supplier) {
-
-                alert(
-                    "Nama supplier wajib diisi."
-                );
-
-                return;
-
-            }
-
-
-            if (!order) {
-
-                alert(
-                    "Nomor order wajib diisi."
-                );
-
-                return;
-
-            }
-
+            ============================================= */
 
             if (
+                !tanggal ||
+                !produk ||
+                !supplier ||
+                !order ||
                 !Number.isFinite(qty) ||
-                qty <= 0
-            ) {
-
-                alert(
-                    "QTY harus lebih dari 0."
-                );
-
-                return;
-
-            }
-
-
-            if (
+                qty <= 0 ||
                 !Number.isFinite(hargaBeli) ||
                 hargaBeli < 0
             ) {
 
                 alert(
-                    "Harga beli tidak valid."
+                    "Mohon isi data pembelian dengan benar."
                 );
 
                 return;
@@ -1219,16 +801,35 @@ if (purchaseForm) {
             }
 
 
-            if (
-                ![
-                    "proses",
-                    "selesai",
-                    "batal"
-                ].includes(status)
-            ) {
+            /* =============================================
+               CEK NOMOR ORDER DUPLIKAT
+            ============================================= */
+
+            const duplicate =
+                purchases.some(item => {
+
+                    return (
+                        String(
+                            item.order
+                        )
+                        .trim()
+                        .toLowerCase()
+                        ===
+                        order
+                            .trim()
+                            .toLowerCase()
+                        &&
+                        Number(item.id) !==
+                        Number(editId)
+                    );
+
+                });
+
+
+            if (duplicate) {
 
                 alert(
-                    "Status pembelian tidak valid."
+                    "Nomor order tersebut sudah digunakan."
                 );
 
                 return;
@@ -1236,9 +837,9 @@ if (purchaseForm) {
             }
 
 
-            /* =========================================
+            /* =============================================
                EDIT DATA
-            ========================================= */
+            ============================================= */
 
             if (editId) {
 
@@ -1264,79 +865,67 @@ if (purchaseForm) {
                 item.tanggal =
                     tanggal;
 
-
                 item.produk =
                     produk;
-
 
                 item.supplier =
                     supplier;
 
-
                 item.order =
                     order;
-
 
                 item.qty =
                     qty;
 
-
                 item.hargaBeli =
                     hargaBeli;
-
 
                 item.status =
                     status;
 
+            }
 
-                savePurchases();
 
-                renderPurchases();
+            /* =============================================
+               TAMBAH DATA
+            ============================================= */
 
-                closeModal();
+            else {
 
-                return;
+                purchases.push({
+
+                    id:
+                        Date.now(),
+
+                    tanggal:
+                        tanggal,
+
+                    produk:
+                        produk,
+
+                    supplier:
+                        supplier,
+
+                    order:
+                        order,
+
+                    qty:
+                        qty,
+
+                    hargaBeli:
+                        hargaBeli,
+
+                    status:
+                        status
+
+                });
 
             }
 
 
-            /* =========================================
-               TAMBAH DATA BARU
-            ========================================= */
-
-            const newPurchase = {
-
-                id:
-                    Date.now(),
-
-                tanggal:
-                    tanggal,
-
-                produk:
-                    produk,
-
-                supplier:
-                    supplier,
-
-                order:
-                    order,
-
-                qty:
-                    qty,
-
-                hargaBeli:
-                    hargaBeli,
-
-                status:
-                    status
-
-            };
-
-
-            purchases.push(
-                newPurchase
-            );
-
+            /* =============================================
+               SAVE
+            ============================================= */
 
             savePurchases();
 
@@ -1347,149 +936,130 @@ if (purchaseForm) {
         }
     );
 
-}
-
 
 /* =====================================================
    SEARCH
 ===================================================== */
 
-const searchInput =
-    document.getElementById(
+document
+    .getElementById(
         "search"
-    );
-
-
-if (searchInput) {
-
-    searchInput.addEventListener(
+    )
+    .addEventListener(
         "input",
-        function() {
-
-            renderPurchases();
-
-        }
+        renderPurchases
     );
-
-}
 
 
 /* =====================================================
    FILTER STATUS
 ===================================================== */
 
-const filterStatus =
-    document.getElementById(
+document
+    .getElementById(
         "filterStatus"
-    );
-
-
-if (filterStatus) {
-
-    filterStatus.addEventListener(
+    )
+    .addEventListener(
         "change",
-        function() {
-
-            renderPurchases();
-
-        }
+        renderPurchases
     );
-
-}
 
 
 /* =====================================================
    MOBILE MENU
 ===================================================== */
 
-const mobileMenu =
-    document.getElementById(
+document
+    .getElementById(
         "mobileMenu"
-    );
-
-
-if (mobileMenu) {
-
-    mobileMenu.addEventListener(
+    )
+    .addEventListener(
         "click",
         function() {
 
-            const sidebar =
-                document.getElementById(
+            document
+                .getElementById(
                     "sidebar"
+                )
+                .classList.toggle(
+                    "open"
                 );
 
+        }
+    );
 
-            if (!sidebar) {
-                return;
+
+/* =====================================================
+   CLOSE MODAL KLIK LUAR
+===================================================== */
+
+document
+    .getElementById(
+        "purchaseModal"
+    )
+    .addEventListener(
+        "click",
+        function(event) {
+
+            if (
+                event.target === this
+            ) {
+
+                closeModal();
+
             }
 
+        }
+    );
 
-            sidebar.classList.toggle(
-                "open"
+
+/* =====================================================
+   ESCAPE CLOSE MODAL
+===================================================== */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            closeModal();
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   NOTIFICATION
+===================================================== */
+
+document
+    .querySelector(".notification")
+    .addEventListener(
+        "click",
+        function() {
+
+            alert(
+                "Belum ada notifikasi baru."
             );
 
         }
     );
 
-}
-
 
 /* =====================================================
-   TUTUP SIDEBAR SAAT KLIK MENU
+   TANGGAL HEADER
 ===================================================== */
 
-const menuLinks =
-    document.querySelectorAll(
-        ".menu a"
-    );
+function updateCurrentDate() {
 
-
-menuLinks.forEach(link => {
-
-    link.addEventListener(
-        "click",
-        function() {
-
-            if (
-                window.innerWidth <= 900
-            ) {
-
-                const sidebar =
-                    document.getElementById(
-                        "sidebar"
-                    );
-
-
-                if (sidebar) {
-
-                    sidebar.classList.remove(
-                        "open"
-                    );
-
-                }
-
-            }
-
-        }
-    );
-
-});
-
-
-/* =====================================================
-   TANGGAL DI TOPBAR
-===================================================== */
-
-const currentDate =
     document.getElementById(
         "currentDate"
-    );
-
-
-if (currentDate) {
-
-    currentDate.textContent =
+    ).textContent =
 
         new Date().toLocaleDateString(
             "id-ID",
@@ -1505,72 +1075,7 @@ if (currentDate) {
 
 
 /* =====================================================
-   TUTUP MODAL KETIKA KLIK AREA LUAR
-===================================================== */
-
-const purchaseModal =
-    document.getElementById(
-        "purchaseModal"
-    );
-
-
-if (purchaseModal) {
-
-    purchaseModal.addEventListener(
-        "click",
-        function(event) {
-
-            if (
-                event.target ===
-                purchaseModal
-            ) {
-
-                closeModal();
-
-            }
-
-        }
-    );
-
-}
-
-
-/* =====================================================
-   TOMBOL ESC UNTUK TUTUP MODAL
-===================================================== */
-
-document.addEventListener(
-    "keydown",
-    function(event) {
-
-        if (
-            event.key === "Escape"
-        ) {
-
-            const modal =
-                document.getElementById(
-                    "purchaseModal"
-                );
-
-
-            if (
-                modal &&
-                modal.classList.contains("show")
-            ) {
-
-                closeModal();
-
-            }
-
-        }
-
-    }
-);
-
-
-/* =====================================================
-   SINKRONISASI LOCALSTORAGE
-   Jika data diubah dari halaman/tab lain
+   SINKRONISASI LOCAL STORAGE
 ===================================================== */
 
 window.addEventListener(
@@ -1578,23 +1083,11 @@ window.addEventListener(
     function(event) {
 
         if (
-            event.key ===
-            "queen_purchases"
+            event.key === PURCHASE_KEY
         ) {
 
-            try {
-
-                purchases =
-                    JSON.parse(
-                        event.newValue
-                    ) || [];
-
-            } catch (error) {
-
-                purchases = [];
-
-            }
-
+            purchases =
+                loadPurchases();
 
             renderPurchases();
 
@@ -1605,56 +1098,11 @@ window.addEventListener(
 
 
 /* =====================================================
-   CEK DATA LOCALSTORAGE
+   START
 ===================================================== */
 
-function loadPurchases() {
-
-    try {
-
-        const saved =
-            localStorage.getItem(
-                "queen_purchases"
-            );
-
-
-        if (
-            saved !== null
-        ) {
-
-            const parsed =
-                JSON.parse(
-                    saved
-                );
-
-
-            if (
-                Array.isArray(parsed)
-            ) {
-
-                purchases =
-                    parsed;
-
-            }
-
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Gagal membaca data pembelian:",
-            error
-        );
-
-    }
-
-}
-
-
-/* =====================================================
-   START APPLICATION
-===================================================== */
-
-loadPurchases();
+updateCurrentDate();
 
 renderPurchases();
+
+</script>
