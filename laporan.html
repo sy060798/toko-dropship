@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Queen Dropship - Laporan</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f5f7fb;
+    color:#111827;
+}
+
+a{
+    text-decoration:none;
+    color:inherit;
+}
+
+button,input,select{
+    font-family:inherit;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:250px;
+    min-height:100vh;
+    background:#111827;
+    color:white;
+    position:fixed;
+    left:0;
+    top:0;
+    bottom:0;
+    z-index:100;
+    display:flex;
+    flex-direction:column;
+}
+
+.logo{
+    height:80px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:0 25px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.logo-icon{
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    background:linear-gradient(135deg,#ff7a00,#0066ff);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.logo-text h2{
+    font-size:18px;
+}
+
+.logo-text span{
+    font-size:11px;
+    color:#9ca3af;
+}
+
+.menu{
+    padding:25px 15px;
+    flex:1;
+}
+
+.menu-title{
+    color:#6b7280;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin:0 10px 12px;
+}
+
+.menu a{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    padding:13px 14px;
+    margin-bottom:5px;
+    border-radius:10px;
+    color:#cbd5e1;
+    font-size:14px;
+}
+
+.menu a:hover{
+    background:rgba(255,255,255,.07);
+    color:white;
+}
+
+.menu a.active{
+    background:linear-gradient(135deg,#ff7a00,#0066ff);
+    color:white;
+}
+
+.menu-icon{
+    width:22px;
+    text-align:center;
+}
+
+.sidebar-bottom{
+    padding:15px;
+    border-top:1px solid rgba(255,255,255,.08);
+}
+
+.version{
+    font-size:11px;
+    color:#6b7280;
+    text-align:center;
+}
+
+/* MAIN */
+
+.main{
+    margin-left:250px;
+    min-height:100vh;
+}
+
+.topbar{
+    height:80px;
+    background:white;
+    border-bottom:1px solid #e5e7eb;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 30px;
+}
+
+.topbar-left h1{
+    font-size:22px;
+    margin-bottom:4px;
+}
+
+.topbar-left p{
+    color:#6b7280;
+    font-size:12px;
+}
+
+.topbar-right{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.notification{
+    width:40px;
+    height:40px;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    background:white;
+    cursor:pointer;
+}
+
+.profile{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.avatar{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#ff7a00,#0066ff);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+}
+
+.profile-info strong{
+    display:block;
+    font-size:13px;
+}
+
+.profile-info span{
+    display:block;
+    font-size:11px;
+    color:#6b7280;
+}
+
+.mobile-menu{
+    display:none;
+}
+
+/* CONTENT */
+
+.content{
+    padding:30px;
+}
+
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.page-header h2{
+    font-size:24px;
+    margin-bottom:5px;
+}
+
+.page-header p{
+    font-size:13px;
+    color:#6b7280;
+}
+
+.btn-primary{
+    border:none;
+    color:white;
+    background:linear-gradient(135deg,#ff7a00,#0066ff);
+    padding:12px 18px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+/* FILTER */
+
+.filter-card{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:15px;
+    padding:18px;
+    margin-bottom:20px;
+}
+
+.filters{
+    display:grid;
+    grid-template-columns:1fr 180px 180px;
+    gap:12px;
+}
+
+.input{
+    width:100%;
+    border:1px solid #dbe1ea;
+    border-radius:9px;
+    padding:11px 13px;
+    outline:none;
+    background:white;
+    font-size:13px;
+}
+
+.input:focus{
+    border-color:#0066ff;
+}
+
+/* SUMMARY */
+
+.summary{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:20px;
+}
+
+.card{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:15px;
+    padding:20px;
+}
+
+.card-label{
+    color:#6b7280;
+    font-size:12px;
+    margin-bottom:8px;
+}
+
+.card-value{
+    font-size:22px;
+    font-weight:800;
+}
+
+.orange{
+    color:#f97316;
+}
+
+.blue{
+    color:#0066ff;
+}
+
+.green{
+    color:#16a34a;
+}
+
+.red{
+    color:#dc2626;
+}
+
+/* PROFIT */
+
+.profit-card{
+    background:linear-gradient(135deg,#111827,#172554);
+    color:white;
+    border-radius:17px;
+    padding:25px;
+    margin-bottom:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    overflow:hidden;
+    position:relative;
+}
+
+.profit-card:after{
+    content:"";
+    position:absolute;
+    width:180px;
+    height:180px;
+    background:linear-gradient(135deg,#ff7a00,#0066ff);
+    opacity:.2;
+    border-radius:50%;
+    right:-50px;
+    top:-70px;
+}
+
+.profit-label{
+    font-size:12px;
+    color:#cbd5e1;
+    margin-bottom:8px;
+}
+
+.profit-value{
+    font-size:30px;
+    font-weight:800;
+}
+
+.profit-desc{
+    font-size:12px;
+    color:#94a3b8;
+    margin-top:6px;
+}
+
+/* TABLE */
+
+.table-card{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:15px;
+    overflow:hidden;
+}
+
+.table-header{
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.table-header h3{
+    font-size:16px;
+}
+
+.table-header span{
+    font-size:11px;
+    color:#6b7280;
+}
+
+.table-wrap{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:850px;
+}
+
+th{
+    background:#f8fafc;
+    text-align:left;
+    color:#64748b;
+    font-size:11px;
+    padding:13px;
+}
+
+td{
+    padding:14px 13px;
+    border-bottom:1px solid #f1f5f9;
+    font-size:12px;
+}
+
+.money{
+    font-weight:bold;
+}
+
+.profit{
+    color:#16a34a;
+    font-weight:bold;
+}
+
+.loss{
+    color:#dc2626;
+    font-weight:bold;
+}
+
+.empty{
+    text-align:center;
+    padding:40px;
+    color:#94a3b8;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1000px){
+
+    .summary{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .filters{
+        grid-template-columns:1fr 1fr;
+    }
+}
+
+@media(max-width:900px){
+
+    .sidebar{
+        transform:translateX(-100%);
+        transition:.25s;
+    }
+
+    .sidebar.open{
+        transform:translateX(0);
+    }
+
+    .main{
+        margin-left:0;
+    }
+
+    .mobile-menu{
+        display:block;
+        border:none;
+        background:#111827;
+        color:white;
+        width:40px;
+        height:40px;
+        border-radius:9px;
+        cursor:pointer;
+        font-size:18px;
+    }
+
+    .topbar{
+        gap:15px;
+    }
+
+    .topbar-left{
+        flex:1;
+    }
+
+    .profile-info{
+        display:none;
+    }
+}
+
+@media(max-width:650px){
+
+    .content{
+        padding:18px;
+    }
+
+    .page-header{
+        align-items:flex-start;
+        gap:15px;
+    }
+
+    .page-header h2{
+        font-size:20px;
+    }
+
+    .summary{
+        grid-template-columns:1fr;
+    }
+
+    .filters{
+        grid-template-columns:1fr;
+    }
+
+    .profit-card{
+        display:block;
+    }
+
+    .profit-value{
+        font-size:25px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar" id="sidebar">
+
+    <div class="logo">
+
+        <div class="logo-icon">
+            Q
+        </div>
+
+        <div class="logo-text">
+            <h2>Queen Dropship</h2>
+            <span>Management System</span>
+        </div>
+
+    </div>
+
+    <nav class="menu">
+
+        <div class="menu-title">
+            Menu Utama
+        </div>
+
+        <a href="index.html">
+            <span class="menu-icon">⌂</span>
+            Dashboard
+        </a>
+
+        <a href="produk.html">
+            <span class="menu-icon">▣</span>
+            Produk
+        </a>
+
+        <a href="supplier.html">
+            <span class="menu-icon">▤</span>
+            Supplier
+        </a>
+
+        <a href="penjualan.html">
+            <span class="menu-icon">🛒</span>
+            Barang Terjual
+        </a>
+
+        <a href="pembelian.html">
+            <span class="menu-icon">📦</span>
+            Pembelian
+        </a>
+
+        <a href="laporan.html" class="active">
+            <span class="menu-icon">▥</span>
+            Laporan
+        </a>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+        <div class="version">
+            Queen Dropship v1.0
+        </div>
+    </div>
+
+</aside>
+
+
+<!-- MAIN -->
+
+<main class="main">
+
+<header class="topbar">
+
+    <button
+        class="mobile-menu"
+        id="mobileMenu">
+        ☰
+    </button>
+
+    <div class="topbar-left">
+
+        <h1>
+            Laporan
+        </h1>
+
+        <p id="currentDate">
+            Memuat tanggal...
+        </p>
+
+    </div>
+
+    <div class="topbar-right">
+
+        <button class="notification">
+            🔔
+        </button>
+
+        <div class="profile">
+
+            <div class="avatar">
+                A
+            </div>
+
+            <div class="profile-info">
+
+                <strong>
+                    Admin
+                </strong>
+
+                <span>
+                    Administrator
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<section class="content">
+
+    <div class="page-header">
+
+        <div>
+
+            <h2>
+                Laporan Keuangan
+            </h2>
+
+            <p>
+                Pantau penjualan, modal, dan keuntungan toko dropship.
+            </p>
+
+        </div>
+
+        <button
+            class="btn-primary"
+            onclick="window.print()">
+
+            🖨 Cetak Laporan
+
+        </button>
+
+    </div>
+
+
+    <!-- FILTER -->
+
+    <div class="filter-card">
+
+        <div class="filters">
+
+            <input
+                type="text"
+                id="search"
+                class="input"
+                placeholder="🔍 Cari produk atau transaksi...">
+
+            <input
+                type="date"
+                id="tanggalMulai"
+                class="input">
+
+            <input
+                type="date"
+                id="tanggalAkhir"
+                class="input">
+
+        </div>
+
+    </div>
+
+
+    <!-- SUMMARY -->
+
+    <div class="summary">
+
+        <div class="card">
+
+            <div class="card-label">
+                Total Penjualan
+            </div>
+
+            <div
+                class="card-value blue"
+                id="totalPenjualan">
+
+                Rp 0
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Total Modal
+            </div>
+
+            <div
+                class="card-value orange"
+                id="totalModal">
+
+                Rp 0
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Keuntungan
+            </div>
+
+            <div
+                class="card-value green"
+                id="totalProfit">
+
+                Rp 0
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Transaksi
+            </div>
+
+            <div
+                class="card-value"
+                id="totalTransaksi">
+
+                0
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- PROFIT -->
+
+    <div class="profit-card">
+
+        <div>
+
+            <div class="profit-label">
+                ESTIMASI KEUNTUNGAN BERSIH
+            </div>
+
+            <div
+                class="profit-value"
+                id="profitBesar">
+
+                Rp 0
+
+            </div>
+
+            <div class="profit-desc">
+                Penjualan dikurangi modal pembelian.
+            </div>
+
+        </div>
+
+        <div style="font-size:45px;position:relative;z-index:2;">
+            📈
+        </div>
+
+    </div>
+
+
+    <!-- TABLE -->
+
+    <div class="table-card">
+
+        <div class="table-header">
+
+            <div>
+
+                <h3>
+                    Detail Laporan
+                </h3>
+
+                <span id="jumlahData">
+                    0 data
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            TANGGAL
+                        </th>
+
+                        <th>
+                            PRODUK
+                        </th>
+
+                        <th>
+                            QTY
+                        </th>
+
+                        <th>
+                            PENJUALAN
+                        </th>
+
+                        <th>
+                            MODAL
+                        </th>
+
+                        <th>
+                            KEUNTUNGAN
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="reportTable">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+</main>
+
+
+<script>
+
+/* =====================================================
+   AMBIL DATA
+===================================================== */
+
+let penjualan =
+    JSON.parse(
+        localStorage.getItem("queen_sales")
+    ) || [];
+
+let pembelian =
+    JSON.parse(
+        localStorage.getItem("queen_purchases")
+    ) || [];
+
+
+/*
+   Beberapa versi penjualan mungkin memakai
+   nama localStorage berbeda.
+*/
+
+if(!penjualan.length){
+
+    penjualan =
+        JSON.parse(
+            localStorage.getItem("penjualan")
+        ) || [];
+
+}
+
+
+/* =====================================================
+   FORMAT RUPIAH
+===================================================== */
+
+function rupiah(number){
+
+    return new Intl.NumberFormat(
+        "id-ID",
+        {
+            style:"currency",
+            currency:"IDR",
+            maximumFractionDigits:0
+        }
+    ).format(number || 0);
+
+}
+
+
+/* =====================================================
+   FORMAT TANGGAL
+===================================================== */
+
+function formatTanggal(date){
+
+    if(!date) return "-";
+
+    return new Date(
+        date + "T00:00:00"
+    ).toLocaleDateString(
+        "id-ID",
+        {
+            day:"2-digit",
+            month:"short",
+            year:"numeric"
+        }
+    );
+
+}
+
+
+/* =====================================================
+   CARI MODAL DARI PEMBELIAN
+===================================================== */
+
+function cariModal(produk){
+
+    const nama =
+        String(produk || "")
+        .toLowerCase();
+
+    const hasil =
+        pembelian.find(item =>
+
+            String(item.produk || "")
+            .toLowerCase() === nama
+
+        );
+
+
+    if(hasil){
+
+        return Number(
+            hasil.hargaBeli || 0
+        );
+
+    }
+
+
+    return 0;
+
+}
+
+
+/* =====================================================
+   NORMALISASI DATA PENJUALAN
+===================================================== */
+
+function getData(){
+
+    return penjualan.map(item => {
+
+        const produk =
+            item.produk ||
+            item.namaProduk ||
+            item.product ||
+            "-";
+
+
+        const qty =
+            Number(
+                item.qty ||
+                item.jumlah ||
+                1
+            );
+
+
+        const hargaJual =
+            Number(
+                item.hargaJual ||
+                item.harga ||
+                item.price ||
+                0
+            );
+
+
+        let modal =
+            Number(
+                item.modal ||
+                item.hargaBeli ||
+                item.cost ||
+                0
+            );
+
+
+        /*
+           Jika penjualan tidak menyimpan modal,
+           ambil harga beli dari pembelian.
+        */
+
+        if(!modal){
+
+            modal =
+                cariModal(
+                    produk
+                );
+
+        }
+
+
+        const totalJual =
+            Number(
+                item.total ||
+                item.totalPenjualan ||
+                (hargaJual * qty)
+            );
+
+
+        const totalModal =
+            modal * qty;
+
+
+        const profit =
+            totalJual -
+            totalModal;
+
+
+        return {
+
+            id:item.id,
+
+            tanggal:
+                item.tanggal ||
+                item.date ||
+                "",
+
+            produk,
+
+            qty,
+
+            totalJual,
+
+            totalModal,
+
+            profit
+
+        };
+
+    });
+
+}
+
+
+/* =====================================================
+   RENDER
+===================================================== */
+
+function renderReport(){
+
+    const table =
+        document.getElementById(
+            "reportTable"
+        );
+
+
+    const search =
+        document.getElementById(
+            "search"
+        )
+        .value
+        .toLowerCase();
+
+
+    const mulai =
+        document.getElementById(
+            "tanggalMulai"
+        ).value;
+
+
+    const akhir =
+        document.getElementById(
+            "tanggalAkhir"
+        ).value;
+
+
+    let data =
+        getData();
+
+
+    data =
+        data.filter(item => {
+
+            const nama =
+                item.produk
+                .toLowerCase();
+
+
+            const cocokSearch =
+                nama.includes(search);
+
+
+            const cocokMulai =
+                !mulai ||
+                item.tanggal >= mulai;
+
+
+            const cocokAkhir =
+                !akhir ||
+                item.tanggal <= akhir;
+
+
+            return (
+                cocokSearch &&
+                cocokMulai &&
+                cocokAkhir
+            );
+
+        });
+
+
+    table.innerHTML = "";
+
+
+    if(!data.length){
+
+        table.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="6"
+                    class="empty">
+
+                    Belum ada data penjualan
+                    untuk laporan.
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+
+    let totalPenjualan = 0;
+    let totalModal = 0;
+    let totalProfit = 0;
+
+
+    data.forEach(item => {
+
+        totalPenjualan +=
+            item.totalJual;
+
+        totalModal +=
+            item.totalModal;
+
+        totalProfit +=
+            item.profit;
+
+
+        const profitClass =
+            item.profit >= 0
+            ? "profit"
+            : "loss";
+
+
+        table.innerHTML += `
+
+            <tr>
+
+                <td>
+                    ${formatTanggal(item.tanggal)}
+                </td>
+
+                <td>
+                    <strong>
+                        ${escapeHtml(item.produk)}
+                    </strong>
+                </td>
+
+                <td>
+                    ${item.qty}
+                </td>
+
+                <td class="money">
+                    ${rupiah(item.totalJual)}
+                </td>
+
+                <td class="money">
+                    ${rupiah(item.totalModal)}
+                </td>
+
+                <td class="${profitClass}">
+                    ${rupiah(item.profit)}
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+
+    document.getElementById(
+        "totalPenjualan"
+    ).textContent =
+        rupiah(totalPenjualan);
+
+
+    document.getElementById(
+        "totalModal"
+    ).textContent =
+        rupiah(totalModal);
+
+
+    document.getElementById(
+        "totalProfit"
+    ).textContent =
+        rupiah(totalProfit);
+
+
+    document.getElementById(
+        "profitBesar"
+    ).textContent =
+        rupiah(totalProfit);
+
+
+    document.getElementById(
+        "totalTransaksi"
+    ).textContent =
+        data.length;
+
+
+    document.getElementById(
+        "jumlahData"
+    ).textContent =
+        `${data.length} transaksi`;
+
+}
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHtml(value){
+
+    return String(value)
+
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+/* =====================================================
+   FILTER
+===================================================== */
+
+document
+.getElementById("search")
+.addEventListener(
+    "input",
+    renderReport
+);
+
+
+document
+.getElementById("tanggalMulai")
+.addEventListener(
+    "change",
+    renderReport
+);
+
+
+document
+.getElementById("tanggalAkhir")
+.addEventListener(
+    "change",
+    renderReport
+);
+
+
+/* =====================================================
+   MOBILE MENU
+===================================================== */
+
+document
+.getElementById("mobileMenu")
+.addEventListener(
+    "click",
+    function(){
+
+        document
+        .getElementById("sidebar")
+        .classList.toggle("open");
+
+    }
+);
+
+
+/* =====================================================
+   TANGGAL
+===================================================== */
+
+document.getElementById(
+    "currentDate"
+).textContent =
+
+    new Date().toLocaleDateString(
+        "id-ID",
+        {
+            weekday:"long",
+            year:"numeric",
+            month:"long",
+            day:"numeric"
+        }
+    );
+
+
+/* =====================================================
+   START
+===================================================== */
+
+renderReport();
+
+
+/*
+   Update otomatis kalau data di localStorage berubah
+   dari halaman lain.
+*/
+
+window.addEventListener(
+    "storage",
+    function(){
+
+        penjualan =
+            JSON.parse(
+                localStorage.getItem(
+                    "queen_sales"
+                )
+            ) || [];
+
+        pembelian =
+            JSON.parse(
+                localStorage.getItem(
+                    "queen_purchases"
+                )
+            ) || [];
+
+        renderReport();
+
+    }
+);
+
+</script>
+
+</body>
+</html>
