@@ -1,0 +1,2085 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Queen Dropship - Penjualan</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f7fb;
+            color: #111827;
+        }
+
+        button,
+        input,
+        select {
+            font-family: inherit;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background: #111827;
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 25px;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ff7a00, #0066ff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .logo-text h2 {
+            font-size: 18px;
+        }
+
+        .logo-text span {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .menu {
+            padding: 25px 15px;
+            flex: 1;
+        }
+
+        .menu-title {
+            color: #6b7280;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 10px 12px;
+        }
+
+        .menu a {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 13px 14px;
+            margin-bottom: 5px;
+            border-radius: 10px;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        .menu a:hover {
+            background: rgba(255,255,255,.07);
+            color: white;
+        }
+
+        .menu a.active {
+            background: linear-gradient(135deg, #ff7a00, #0066ff);
+            color: white;
+        }
+
+        .menu-icon {
+            width: 22px;
+            text-align: center;
+        }
+
+        .sidebar-bottom {
+            padding: 15px;
+            border-top: 1px solid rgba(255,255,255,.08);
+        }
+
+        .version {
+            font-size: 11px;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .main {
+            margin-left: 250px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            height: 80px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .topbar-left h1 {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        .topbar-left p {
+            color: #6b7280;
+            font-size: 12px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .notification {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff7a00, #0066ff);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .profile-info strong {
+            display: block;
+            font-size: 13px;
+        }
+
+        .profile-info span {
+            display: block;
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .mobile-menu {
+            display: none;
+        }
+
+        /* =========================
+           CONTENT
+        ========================= */
+
+        .content {
+            padding: 30px;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .page-header h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .page-header p {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .btn-primary {
+            border: none;
+            color: white;
+            background: linear-gradient(135deg, #ff7a00, #0066ff);
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 7px 20px rgba(0,102,255,.18);
+        }
+
+        .btn-primary:hover {
+            opacity: .9;
+        }
+
+        /* =========================
+           SUMMARY
+        ========================= */
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+
+        .summary-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 23px;
+            font-weight: 800;
+        }
+
+        .orange {
+            color: #f97316;
+        }
+
+        .blue {
+            color: #0066ff;
+        }
+
+        .green {
+            color: #16a34a;
+        }
+
+        /* =========================
+           SEARCH
+        ========================= */
+
+        .filter-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 15px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: 1fr 180px;
+            gap: 12px;
+        }
+
+        .input {
+            width: 100%;
+            border: 1px solid #dbe1ea;
+            border-radius: 9px;
+            padding: 11px 13px;
+            outline: none;
+            background: white;
+            font-size: 13px;
+        }
+
+        .input:focus {
+            border-color: #0066ff;
+            box-shadow: 0 0 0 3px rgba(0,102,255,.08);
+        }
+
+        /* =========================
+           TABLE
+        ========================= */
+
+        .table-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h3 {
+            font-size: 16px;
+        }
+
+        .table-header span {
+            color: #6b7280;
+            font-size: 11px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        th {
+            background: #f8fafc;
+            text-align: left;
+            color: #64748b;
+            font-size: 11px;
+            padding: 13px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px 13px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        tbody tr:hover {
+            background: #fafcff;
+        }
+
+        .product {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .product-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #ff7a00, #0066ff);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .product strong {
+            display: block;
+            font-size: 12px;
+        }
+
+        .product span {
+            color: #94a3b8;
+            font-size: 10px;
+        }
+
+        .money {
+            font-weight: bold;
+        }
+
+        .profit {
+            color: #16a34a;
+            font-weight: bold;
+        }
+
+        .status {
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .success-status {
+            color: #15803d;
+            background: #dcfce7;
+        }
+
+        .process-status {
+            color: #0369a1;
+            background: #e0f2fe;
+        }
+
+        .cancel-status {
+            color: #dc2626;
+            background: #fee2e2;
+        }
+
+        .actions {
+            display: flex;
+            gap: 7px;
+        }
+
+        .btn-edit,
+        .btn-delete {
+            border: none;
+            padding: 7px 9px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .btn-edit {
+            background: #eaf2ff;
+            color: #0066ff;
+        }
+
+        .btn-delete {
+            background: #fff1f2;
+            color: #dc2626;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+
+        /* =========================
+           MODAL
+        ========================= */
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,.55);
+            z-index: 500;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-box {
+            width: 100%;
+            max-width: 560px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+        }
+
+        .close {
+            border: none;
+            background: #f1f5f9;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .btn-cancel {
+            border: 1px solid #dbe1ea;
+            background: white;
+            padding: 11px 17px;
+            border-radius: 9px;
+            cursor: pointer;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media(max-width: 900px) {
+
+            .sidebar {
+                transform: translateX(-100%);
+                transition: .25s;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .mobile-menu {
+                display: block;
+                border: none;
+                background: #111827;
+                color: white;
+                width: 40px;
+                height: 40px;
+                border-radius: 9px;
+                cursor: pointer;
+                font-size: 18px;
+            }
+
+            .topbar {
+                gap: 15px;
+            }
+
+            .topbar-left {
+                flex: 1;
+            }
+
+            .profile-info {
+                display: none;
+            }
+        }
+
+        @media(max-width: 650px) {
+
+            .content {
+                padding: 18px;
+            }
+
+            .summary {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .page-header h2 {
+                font-size: 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+
+<aside class="sidebar" id="sidebar">
+
+    <div class="logo">
+
+        <div class="logo-icon">
+            Q
+        </div>
+
+        <div class="logo-text">
+
+            <h2>Queen Dropship</h2>
+
+            <span>
+                Management System
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <nav class="menu">
+
+        <div class="menu-title">
+            Menu Utama
+        </div>
+
+
+        <a href="index.html">
+
+            <span class="menu-icon">
+                ⌂
+            </span>
+
+            Dashboard
+
+        </a>
+
+
+        <a href="produk.html">
+
+            <span class="menu-icon">
+                ▣
+            </span>
+
+            Produk
+
+        </a>
+
+
+        <a href="supplier.html">
+
+            <span class="menu-icon">
+                ▤
+            </span>
+
+            Supplier
+
+        </a>
+
+
+        <a href="penjualan.html" class="active">
+
+            <span class="menu-icon">
+                🛒
+            </span>
+
+            Barang Terjual
+
+        </a>
+
+
+        <a href="pembelian.html">
+
+            <span class="menu-icon">
+                📦
+            </span>
+
+            Pembelian
+
+        </a>
+
+
+        <a href="laporan.html">
+
+            <span class="menu-icon">
+                ▥
+            </span>
+
+            Laporan
+
+        </a>
+
+    </nav>
+
+
+    <div class="sidebar-bottom">
+
+        <div class="version">
+            Queen Dropship v1.0
+        </div>
+
+    </div>
+
+</aside>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="main">
+
+    <header class="topbar">
+
+        <button
+            class="mobile-menu"
+            id="mobileMenu">
+
+            ☰
+
+        </button>
+
+
+        <div class="topbar-left">
+
+            <h1>
+                Penjualan
+            </h1>
+
+            <p id="currentDate">
+                Memuat tanggal...
+            </p>
+
+        </div>
+
+
+        <div class="topbar-right">
+
+            <button class="notification">
+                🔔
+            </button>
+
+
+            <div class="profile">
+
+                <div class="avatar">
+                    A
+                </div>
+
+
+                <div class="profile-info">
+
+                    <strong>
+                        Admin
+                    </strong>
+
+                    <span>
+                        Administrator
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =================================================
+         CONTENT
+    ================================================== -->
+
+    <section class="content">
+
+        <div class="page-header">
+
+            <div>
+
+                <h2>
+                    Barang Terjual
+                </h2>
+
+                <p>
+                    Catat semua pesanan yang berhasil kamu jual.
+                </p>
+
+            </div>
+
+
+            <button
+                class="btn-primary"
+                onclick="openModal()">
+
+                + Tambah Penjualan
+
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             SUMMARY
+        ================================================== -->
+
+        <div class="summary">
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Total Terjual
+                </div>
+
+                <div
+                    class="summary-value orange"
+                    id="totalTerjual">
+
+                    0
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Omzet
+                </div>
+
+                <div
+                    class="summary-value blue"
+                    id="totalOmzet">
+
+                    Rp 0
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Profit
+                </div>
+
+                <div
+                    class="summary-value green"
+                    id="totalProfit">
+
+                    Rp 0
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FILTER
+        ================================================== -->
+
+        <div class="filter-card">
+
+            <div class="filters">
+
+                <input
+                    type="text"
+                    id="search"
+                    class="input"
+                    placeholder="🔍 Cari produk atau nomor order...">
+
+
+                <select
+                    id="filterStatus"
+                    class="input">
+
+                    <option value="all">
+                        Semua Status
+                    </option>
+
+                    <option value="selesai">
+                        Selesai
+                    </option>
+
+                    <option value="proses">
+                        Diproses
+                    </option>
+
+                    <option value="batal">
+                        Batal
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             TABLE
+        ================================================== -->
+
+        <div class="table-card">
+
+            <div class="table-header">
+
+                <div>
+
+                    <h3>
+                        Riwayat Penjualan
+                    </h3>
+
+                    <span id="jumlahHasil">
+                        0 transaksi
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                TANGGAL
+                            </th>
+
+                            <th>
+                                PRODUK
+                            </th>
+
+                            <th>
+                                ORDER
+                            </th>
+
+                            <th>
+                                QTY
+                            </th>
+
+                            <th>
+                                MODAL
+                            </th>
+
+                            <th>
+                                OMZET
+                            </th>
+
+                            <th>
+                                PROFIT
+                            </th>
+
+                            <th>
+                                STATUS
+                            </th>
+
+                            <th>
+                                AKSI
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="salesTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- =====================================================
+     MODAL
+===================================================== -->
+
+<div
+    class="modal"
+    id="saleModal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h3 id="modalTitle">
+                Tambah Penjualan
+            </h3>
+
+
+            <button
+                class="close"
+                onclick="closeModal()">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <form id="saleForm">
+
+            <input
+                type="hidden"
+                id="editId">
+
+
+            <div class="form-group">
+
+                <label>
+                    Tanggal
+                </label>
+
+                <input
+                    type="date"
+                    id="tanggal"
+                    class="input"
+                    required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Nama Produk
+                </label>
+
+                <input
+                    type="text"
+                    id="produk"
+                    class="input"
+                    placeholder="Contoh: Kaos Basic"
+                    required>
+
+            </div>
+
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>
+                        Nomor Order
+                    </label>
+
+                    <input
+                        type="text"
+                        id="order"
+                        class="input"
+                        placeholder="ORD-001"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Jumlah / QTY
+                    </label>
+
+                    <input
+                        type="number"
+                        id="qty"
+                        class="input"
+                        value="1"
+                        min="1"
+                        required>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>
+                        Harga Supplier / Modal
+                    </label>
+
+                    <input
+                        type="number"
+                        id="modal"
+                        class="input"
+                        placeholder="35000"
+                        min="0"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Harga Jual
+                    </label>
+
+                    <input
+                        type="number"
+                        id="hargaJual"
+                        class="input"
+                        placeholder="59000"
+                        min="0"
+                        required>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Status Pesanan
+                </label>
+
+                <select
+                    id="status"
+                    class="input">
+
+                    <option value="selesai">
+                        Selesai
+                    </option>
+
+                    <option value="proses">
+                        Diproses
+                    </option>
+
+                    <option value="batal">
+                        Batal
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn-cancel"
+                    onclick="closeModal()">
+
+                    Batal
+
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="btn-primary">
+
+                    Simpan Penjualan
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script>
+
+    /* =====================================================
+       DATA PENJUALAN
+    ===================================================== */
+
+    let sales =
+        JSON.parse(
+            localStorage.getItem(
+                "queen_sales"
+            )
+        ) || [
+
+            {
+                id: 1,
+                tanggal: "2026-09-14",
+                produk: "Kaos Basic",
+                order: "ORD-001",
+                qty: 2,
+                modal: 35000,
+                hargaJual: 59000,
+                status: "selesai"
+            },
+
+            {
+                id: 2,
+                tanggal: "2026-09-14",
+                produk: "Tumbler Stainless",
+                order: "ORD-002",
+                qty: 1,
+                modal: 40000,
+                hargaJual: 69000,
+                status: "selesai"
+            },
+
+            {
+                id: 3,
+                tanggal: "2026-09-15",
+                produk: "Botol Minum",
+                order: "ORD-003",
+                qty: 3,
+                modal: 28000,
+                hargaJual: 45000,
+                status: "proses"
+            }
+
+        ];
+
+
+    /* =====================================================
+       FORMAT RUPIAH
+    ===================================================== */
+
+    function rupiah(number) {
+
+        return new Intl.NumberFormat(
+            "id-ID",
+            {
+                style: "currency",
+                currency: "IDR",
+                maximumFractionDigits: 0
+            }
+        ).format(number);
+
+    }
+
+
+    /* =====================================================
+       SIMPAN DATA
+    ===================================================== */
+
+    function saveSales() {
+
+        localStorage.setItem(
+            "queen_sales",
+            JSON.stringify(sales)
+        );
+
+    }
+
+
+    /* =====================================================
+       FORMAT TANGGAL
+    ===================================================== */
+
+    function formatTanggal(date) {
+
+        if (!date) return "-";
+
+        return new Date(
+            date + "T00:00:00"
+        ).toLocaleDateString(
+            "id-ID",
+            {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       RENDER TABLE
+    ===================================================== */
+
+    function renderSales() {
+
+        const table =
+            document.getElementById(
+                "salesTable"
+            );
+
+
+        const search =
+            document.getElementById(
+                "search"
+            )
+            .value
+            .toLowerCase();
+
+
+        const filter =
+            document.getElementById(
+                "filterStatus"
+            )
+            .value;
+
+
+        const filtered =
+            sales.filter(sale => {
+
+                const matchSearch =
+
+                    sale.produk
+                        .toLowerCase()
+                        .includes(search)
+
+                    ||
+
+                    sale.order
+                        .toLowerCase()
+                        .includes(search);
+
+
+                const matchStatus =
+                    filter === "all"
+                    ||
+                    sale.status === filter;
+
+
+                return (
+                    matchSearch &&
+                    matchStatus
+                );
+
+            });
+
+
+        table.innerHTML = "";
+
+
+        if (filtered.length === 0) {
+
+            table.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="9"
+                        class="empty">
+
+                        Belum ada transaksi.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+
+
+        filtered.forEach(sale => {
+
+            const modalTotal =
+                sale.modal *
+                sale.qty;
+
+
+            const omzet =
+                sale.hargaJual *
+                sale.qty;
+
+
+            const profit =
+                omzet -
+                modalTotal;
+
+
+            const firstLetter =
+                sale.produk
+                    .charAt(0)
+                    .toUpperCase();
+
+
+            let statusHTML = "";
+
+
+            if (sale.status === "selesai") {
+
+                statusHTML = `
+
+                    <span class="status success-status">
+                        Selesai
+                    </span>
+
+                `;
+
+            }
+
+
+            if (sale.status === "proses") {
+
+                statusHTML = `
+
+                    <span class="status process-status">
+                        Diproses
+                    </span>
+
+                `;
+
+            }
+
+
+            if (sale.status === "batal") {
+
+                statusHTML = `
+
+                    <span class="status cancel-status">
+                        Batal
+                    </span>
+
+                `;
+
+            }
+
+
+            table.innerHTML += `
+
+                <tr>
+
+                    <td>
+                        ${formatTanggal(sale.tanggal)}
+                    </td>
+
+
+                    <td>
+
+                        <div class="product">
+
+                            <div class="product-img">
+                                ${firstLetter}
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    ${escapeHtml(sale.produk)}
+                                </strong>
+
+                                <span>
+                                    Barang dropship
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </td>
+
+
+                    <td>
+                        ${escapeHtml(sale.order)}
+                    </td>
+
+
+                    <td>
+                        ${sale.qty}
+                    </td>
+
+
+                    <td class="money">
+                        ${rupiah(modalTotal)}
+                    </td>
+
+
+                    <td class="money">
+                        ${rupiah(omzet)}
+                    </td>
+
+
+                    <td class="profit">
+                        ${rupiah(profit)}
+                    </td>
+
+
+                    <td>
+                        ${statusHTML}
+                    </td>
+
+
+                    <td>
+
+                        <div class="actions">
+
+                            <button
+                                class="btn-edit"
+                                onclick="editSale(${sale.id})">
+
+                                Edit
+
+                            </button>
+
+
+                            <button
+                                class="btn-delete"
+                                onclick="deleteSale(${sale.id})">
+
+                                Hapus
+
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        });
+
+
+        updateSummary(
+            filtered
+        );
+
+    }
+
+
+    /* =====================================================
+       SUMMARY
+    ===================================================== */
+
+    function updateSummary(filtered) {
+
+        let totalQty = 0;
+        let totalOmzet = 0;
+        let totalProfit = 0;
+
+
+        filtered.forEach(sale => {
+
+            /*
+             * Transaksi batal tidak
+             * dihitung sebagai omzet/profit
+             */
+
+            if (sale.status === "batal") {
+                return;
+            }
+
+
+            totalQty +=
+                sale.qty;
+
+
+            totalOmzet +=
+                sale.hargaJual *
+                sale.qty;
+
+
+            totalProfit +=
+
+                (
+                    sale.hargaJual -
+                    sale.modal
+                )
+                *
+                sale.qty;
+
+        });
+
+
+        document.getElementById(
+            "totalTerjual"
+        ).textContent =
+            totalQty;
+
+
+        document.getElementById(
+            "totalOmzet"
+        ).textContent =
+            rupiah(totalOmzet);
+
+
+        document.getElementById(
+            "totalProfit"
+        ).textContent =
+            rupiah(totalProfit);
+
+
+        document.getElementById(
+            "jumlahHasil"
+        ).textContent =
+            `${filtered.length} transaksi`;
+
+    }
+
+
+    /* =====================================================
+       OPEN MODAL
+    ===================================================== */
+
+    function openModal() {
+
+        document.getElementById(
+            "saleModal"
+        ).classList.add("show");
+
+
+        document.getElementById(
+            "modalTitle"
+        ).textContent =
+            "Tambah Penjualan";
+
+
+        document.getElementById(
+            "saleForm"
+        ).reset();
+
+
+        document.getElementById(
+            "editId"
+        ).value = "";
+
+
+        /*
+         * Default tanggal hari ini
+         */
+
+        document.getElementById(
+            "tanggal"
+        ).value =
+            new Date()
+                .toISOString()
+                .split("T")[0];
+
+    }
+
+
+    /* =====================================================
+       CLOSE MODAL
+    ===================================================== */
+
+    function closeModal() {
+
+        document.getElementById(
+            "saleModal"
+        ).classList.remove("show");
+
+    }
+
+
+    /* =====================================================
+       EDIT
+    ===================================================== */
+
+    function editSale(id) {
+
+        const sale =
+            sales.find(
+                s => s.id === id
+            );
+
+
+        if (!sale) return;
+
+
+        document.getElementById(
+            "saleModal"
+        ).classList.add("show");
+
+
+        document.getElementById(
+            "modalTitle"
+        ).textContent =
+            "Edit Penjualan";
+
+
+        document.getElementById(
+            "editId"
+        ).value =
+            sale.id;
+
+
+        document.getElementById(
+            "tanggal"
+        ).value =
+            sale.tanggal;
+
+
+        document.getElementById(
+            "produk"
+        ).value =
+            sale.produk;
+
+
+        document.getElementById(
+            "order"
+        ).value =
+            sale.order;
+
+
+        document.getElementById(
+            "qty"
+        ).value =
+            sale.qty;
+
+
+        document.getElementById(
+            "modal"
+        ).value =
+            sale.modal;
+
+
+        document.getElementById(
+            "hargaJual"
+        ).value =
+            sale.hargaJual;
+
+
+        document.getElementById(
+            "status"
+        ).value =
+            sale.status;
+
+    }
+
+
+    /* =====================================================
+       DELETE
+    ===================================================== */
+
+    function deleteSale(id) {
+
+        const sale =
+            sales.find(
+                s => s.id === id
+            );
+
+
+        if (!sale) return;
+
+
+        const yakin =
+            confirm(
+                `Hapus transaksi "${sale.order}"?`
+            );
+
+
+        if (!yakin) return;
+
+
+        sales =
+            sales.filter(
+                s => s.id !== id
+            );
+
+
+        saveSales();
+
+        renderSales();
+
+    }
+
+
+    /* =====================================================
+       SUBMIT FORM
+    ===================================================== */
+
+    document
+        .getElementById(
+            "saleForm"
+        )
+        .addEventListener(
+            "submit",
+            function(event) {
+
+                event.preventDefault();
+
+
+                const editId =
+                    document.getElementById(
+                        "editId"
+                    ).value;
+
+
+                const tanggal =
+                    document.getElementById(
+                        "tanggal"
+                    ).value;
+
+
+                const produk =
+                    document.getElementById(
+                        "produk"
+                    ).value.trim();
+
+
+                const order =
+                    document.getElementById(
+                        "order"
+                    ).value.trim();
+
+
+                const qty =
+                    Number(
+                        document.getElementById(
+                            "qty"
+                        ).value
+                    );
+
+
+                const modal =
+                    Number(
+                        document.getElementById(
+                            "modal"
+                        ).value
+                    );
+
+
+                const hargaJual =
+                    Number(
+                        document.getElementById(
+                            "hargaJual"
+                        ).value
+                    );
+
+
+                const status =
+                    document.getElementById(
+                        "status"
+                    ).value;
+
+
+                if (
+                    !tanggal ||
+                    !produk ||
+                    !order ||
+                    qty <= 0 ||
+                    modal < 0 ||
+                    hargaJual < 0
+                ) {
+
+                    alert(
+                        "Mohon isi data penjualan dengan benar."
+                    );
+
+                    return;
+
+                }
+
+
+                if (editId) {
+
+                    const sale =
+                        sales.find(
+                            s =>
+                                s.id ===
+                                Number(editId)
+                        );
+
+
+                    if (sale) {
+
+                        sale.tanggal =
+                            tanggal;
+
+                        sale.produk =
+                            produk;
+
+                        sale.order =
+                            order;
+
+                        sale.qty =
+                            qty;
+
+                        sale.modal =
+                            modal;
+
+                        sale.hargaJual =
+                            hargaJual;
+
+                        sale.status =
+                            status;
+
+                    }
+
+                } else {
+
+                    sales.push({
+
+                        id:
+                            Date.now(),
+
+                        tanggal,
+
+                        produk,
+
+                        order,
+
+                        qty,
+
+                        modal,
+
+                        hargaJual,
+
+                        status
+
+                    });
+
+                }
+
+
+                saveSales();
+
+                renderSales();
+
+                closeModal();
+
+            }
+        );
+
+
+    /* =====================================================
+       SEARCH
+    ===================================================== */
+
+    document
+        .getElementById(
+            "search"
+        )
+        .addEventListener(
+            "input",
+            renderSales
+        );
+
+
+    /* =====================================================
+       FILTER
+    ===================================================== */
+
+    document
+        .getElementById(
+            "filterStatus"
+        )
+        .addEventListener(
+            "change",
+            renderSales
+        );
+
+
+    /* =====================================================
+       ESCAPE HTML
+    ===================================================== */
+
+    function escapeHtml(value) {
+
+        return String(value)
+
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+
+            .replace(
+                /</g,
+                "&lt;"
+            )
+
+            .replace(
+                />/g,
+                "&gt;"
+            )
+
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+
+    }
+
+
+    /* =====================================================
+       MOBILE MENU
+    ===================================================== */
+
+    document
+        .getElementById(
+            "mobileMenu"
+        )
+        .addEventListener(
+            "click",
+            function() {
+
+                document
+                    .getElementById(
+                        "sidebar"
+                    )
+                    .classList.toggle(
+                        "open"
+                    );
+
+            }
+        );
+
+
+    /* =====================================================
+       DATE
+    ===================================================== */
+
+    document.getElementById(
+        "currentDate"
+    ).textContent =
+
+        new Date().toLocaleDateString(
+            "id-ID",
+            {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            }
+        );
+
+
+    /* =====================================================
+       START
+    ===================================================== */
+
+    renderSales();
+
+</script>
+
+</body>
+</html>
