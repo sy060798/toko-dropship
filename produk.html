@@ -23,7 +23,8 @@
 
         button,
         input,
-        select {
+        select,
+        textarea {
             font-family: inherit;
         }
 
@@ -149,12 +150,12 @@
             padding: 0 30px;
         }
 
-        .topbar h1 {
+        .topbar-left h1 {
             font-size: 22px;
             margin-bottom: 4px;
         }
 
-        .topbar p {
+        .topbar-left p {
             color: #6b7280;
             font-size: 12px;
         }
@@ -344,7 +345,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 850px;
+            min-width: 950px;
         }
 
         th {
@@ -400,6 +401,14 @@
         }
 
         .profit {
+            color: #16a34a;
+            font-weight: bold;
+        }
+
+        .margin-percent {
+            display: inline-block;
+            margin-top: 3px;
+            font-size: 10px;
             color: #16a34a;
             font-weight: bold;
         }
@@ -472,7 +481,7 @@
 
         .modal-box {
             width: 100%;
-            max-width: 520px;
+            max-width: 560px;
             max-height: 90vh;
             overflow-y: auto;
             background: white;
@@ -516,6 +525,72 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
+        }
+
+        /* =========================
+           MARGIN BOX
+        ========================= */
+
+        .margin-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .margin-box-title {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .margin-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .margin-info-item {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 9px;
+            padding: 10px;
+        }
+
+        .margin-info-item span {
+            display: block;
+            color: #64748b;
+            font-size: 10px;
+            margin-bottom: 4px;
+        }
+
+        .margin-info-item strong {
+            font-size: 14px;
+        }
+
+        .auto-note {
+            margin-top: 10px;
+            padding: 9px 10px;
+            border-radius: 8px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        .price-preview {
+            margin-top: 10px;
+            background: #ecfdf5;
+            border: 1px solid #bbf7d0;
+            border-radius: 9px;
+            padding: 10px;
+            color: #166534;
+            font-size: 11px;
+        }
+
+        .price-preview strong {
+            font-size: 15px;
         }
 
         .modal-footer {
@@ -603,6 +678,10 @@
             .form-row {
                 grid-template-columns: 1fr;
             }
+
+            .margin-info {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -627,7 +706,6 @@
         </div>
 
     </div>
-
 
     <nav class="menu">
 
@@ -667,7 +745,6 @@
 
     </nav>
 
-
     <div class="sidebar-bottom">
         <div class="version">
             Queen Dropship v1.0
@@ -682,8 +759,6 @@
 ========================================================= -->
 
 <main class="main">
-
-    <!-- TOPBAR -->
 
     <header class="topbar">
 
@@ -702,7 +777,6 @@
             </p>
 
         </div>
-
 
         <div class="topbar-right">
 
@@ -728,20 +802,24 @@
     </header>
 
 
-    <!-- CONTENT -->
+    <!-- =====================================================
+         CONTENT
+    ====================================================== -->
 
     <section class="content">
-
-        <!-- PAGE HEADER -->
 
         <div class="page-header">
 
             <div>
-                <h2>Daftar Produk</h2>
+
+                <h2>
+                    Daftar Produk
+                </h2>
 
                 <p>
                     Kelola barang yang kamu jual secara dropship.
                 </p>
+
             </div>
 
             <button
@@ -755,7 +833,9 @@
         </div>
 
 
-        <!-- SUMMARY -->
+        <!-- =================================================
+             SUMMARY
+        ================================================== -->
 
         <div class="summary">
 
@@ -812,7 +892,9 @@
         </div>
 
 
-        <!-- FILTER -->
+        <!-- =================================================
+             FILTER
+        ================================================== -->
 
         <div class="filter-card">
 
@@ -848,18 +930,24 @@
         </div>
 
 
-        <!-- TABLE -->
+        <!-- =================================================
+             TABLE
+        ================================================== -->
 
         <div class="table-card">
 
             <div class="table-header">
 
                 <div>
-                    <h3>Produk Saya</h3>
+
+                    <h3>
+                        Produk Saya
+                    </h3>
 
                     <span id="jumlahHasil">
                         0 produk
                     </span>
+
                 </div>
 
             </div>
@@ -873,21 +961,39 @@
 
                         <tr>
 
-                            <th>PRODUK</th>
-                            <th>SKU</th>
-                            <th>HARGA SUPPLIER</th>
-                            <th>HARGA JUAL</th>
-                            <th>MARGIN</th>
-                            <th>STATUS</th>
-                            <th>AKSI</th>
+                            <th>
+                                PRODUK
+                            </th>
+
+                            <th>
+                                SKU
+                            </th>
+
+                            <th>
+                                HARGA SUPPLIER
+                            </th>
+
+                            <th>
+                                HARGA JUAL
+                            </th>
+
+                            <th>
+                                MARGIN
+                            </th>
+
+                            <th>
+                                STATUS
+                            </th>
+
+                            <th>
+                                AKSI
+                            </th>
 
                         </tr>
 
                     </thead>
 
-
                     <tbody id="productTable">
-
                     </tbody>
 
                 </table>
@@ -935,9 +1041,11 @@
                 id="editId">
 
 
+            <!-- NAMA -->
+
             <div class="form-group">
 
-                <label>
+                <label for="nama">
                     Nama Produk
                 </label>
 
@@ -951,11 +1059,13 @@
             </div>
 
 
+            <!-- SKU + STATUS -->
+
             <div class="form-row">
 
                 <div class="form-group">
 
-                    <label>
+                    <label for="sku">
                         SKU
                     </label>
 
@@ -971,7 +1081,7 @@
 
                 <div class="form-group">
 
-                    <label>
+                    <label for="status">
                         Status
                     </label>
 
@@ -994,47 +1104,193 @@
             </div>
 
 
-            <div class="form-row">
+            <!-- HARGA SUPPLIER -->
 
-                <div class="form-group">
+            <div class="form-group">
 
-                    <label>
-                        Harga Supplier
-                    </label>
+                <label for="hargaSupplier">
+                    Harga Supplier
+                </label>
 
-                    <input
-                        type="number"
-                        id="hargaSupplier"
-                        class="input"
-                        placeholder="35000"
-                        min="0"
-                        required>
+                <input
+                    type="number"
+                    id="hargaSupplier"
+                    class="input"
+                    placeholder="35000"
+                    min="0"
+                    step="1"
+                    required>
+
+            </div>
+
+
+            <!-- MARGIN -->
+
+            <div class="margin-box">
+
+                <div class="margin-box-title">
+                    Pengaturan Harga Jual
+                </div>
+
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="margin">
+                            Pilih Margin
+                        </label>
+
+                        <select
+                            id="margin"
+                            class="input">
+
+                            <option value="10">
+                                10%
+                            </option>
+
+                            <option value="12">
+                                12%
+                            </option>
+
+                            <option value="15">
+                                15%
+                            </option>
+
+                            <option value="20" selected>
+                                20%
+                            </option>
+
+                            <option value="21">
+                                21%
+                            </option>
+
+                            <option value="25">
+                                25%
+                            </option>
+
+                            <option value="50">
+                                50%
+                            </option>
+
+                            <option value="auto">
+                                Auto
+                            </option>
+
+                            <option value="manual">
+                                Manual
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="biayaShopee">
+                            Biaya Shopee
+                        </label>
+
+                        <input
+                            type="number"
+                            id="biayaShopee"
+                            class="input"
+                            value="5000"
+                            min="0"
+                            step="1000">
+
+                    </div>
 
                 </div>
 
 
-                <div class="form-group">
+                <div class="auto-note">
 
-                    <label>
-                        Harga Jual
-                    </label>
+                    <strong>Auto:</strong>
+                    harga jual dihitung dari harga supplier
+                    + margin yang dipilih
+                    + biaya Shopee.
 
-                    <input
-                        type="number"
-                        id="hargaJual"
-                        class="input"
-                        placeholder="59000"
-                        min="0"
-                        required>
+                </div>
+
+
+                <div class="price-preview">
+
+                    Harga jual otomatis:
+
+                    <strong id="hargaJualPreview">
+                        Rp 0
+                    </strong>
 
                 </div>
 
             </div>
 
 
+            <!-- HARGA JUAL -->
+
             <div class="form-group">
 
-                <label>
+                <label for="hargaJual">
+                    Harga Jual
+                </label>
+
+                <input
+                    type="number"
+                    id="hargaJual"
+                    class="input"
+                    placeholder="59000"
+                    min="0"
+                    step="1"
+                    required>
+
+            </div>
+
+
+            <!-- INFORMASI MARGIN -->
+
+            <div class="margin-info">
+
+                <div class="margin-info-item">
+
+                    <span>
+                        Keuntungan
+                    </span>
+
+                    <strong
+                        id="profitPreview">
+
+                        Rp 0
+
+                    </strong>
+
+                </div>
+
+
+                <div class="margin-info-item">
+
+                    <span>
+                        Margin
+                    </span>
+
+                    <strong
+                        id="marginPreview">
+
+                        0%
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- DESKRIPSI -->
+
+            <div class="form-group">
+
+                <label for="deskripsi">
                     Deskripsi
                 </label>
 
@@ -1047,6 +1303,8 @@
             </div>
 
 
+            <!-- FOOTER -->
+
             <div class="modal-footer">
 
                 <button
@@ -1057,6 +1315,7 @@
                     Batal
 
                 </button>
+
 
                 <button
                     type="submit"
@@ -1081,51 +1340,51 @@
 
 <script>
 
-    /* =========================
-       DATA
-    ========================= */
-
-    let products =
-        JSON.parse(localStorage.getItem("queen_products")) || [
-
-        {
-            id: 1,
-            nama: "Kaos Basic",
-            sku: "KSB-001",
-            hargaSupplier: 35000,
-            hargaJual: 59000,
-            status: "active",
-            deskripsi: "Kaos basic pria dan wanita"
-        },
-
-        {
-            id: 2,
-            nama: "Tumbler Stainless",
-            sku: "TMB-002",
-            hargaSupplier: 40000,
-            hargaJual: 69000,
-            status: "active",
-            deskripsi: "Tumbler stainless"
-        },
-
-        {
-            id: 3,
-            nama: "Botol Minum",
-            sku: "BTL-003",
-            hargaSupplier: 28000,
-            hargaJual: 45000,
-            status: "active",
-            deskripsi: "Botol minum olahraga"
-        }
-
-    ];
+    /*
+     * CATATAN:
+     * Logic data produk akan kita taruh di file JS terpisah.
+     *
+     * HTML ini sudah menyiapkan ID:
+     *
+     * #margin
+     * #biayaShopee
+     * #hargaSupplier
+     * #hargaJual
+     * #hargaJualPreview
+     * #profitPreview
+     * #marginPreview
+     *
+     * sehingga JS produk bisa langsung sinkron.
+     */
 
 
     /* =========================
-       FORMAT RUPIAH
+       PREVIEW HARGA
     ========================= */
 
-    function rupiah(number) {
+    const hargaSupplierInput =
+        document.getElementById("hargaSupplier");
+
+    const hargaJualInput =
+        document.getElementById("hargaJual");
+
+    const marginInput =
+        document.getElementById("margin");
+
+    const biayaShopeeInput =
+        document.getElementById("biayaShopee");
+
+    const hargaJualPreview =
+        document.getElementById("hargaJualPreview");
+
+    const profitPreview =
+        document.getElementById("profitPreview");
+
+    const marginPreview =
+        document.getElementById("marginPreview");
+
+
+    function formatRupiah(number) {
 
         return new Intl.NumberFormat("id-ID", {
 
@@ -1135,590 +1394,211 @@
 
             maximumFractionDigits: 0
 
-        }).format(number);
+        }).format(number || 0);
 
     }
 
 
-    /* =========================
-       SIMPAN
-    ========================= */
+    function updatePricePreview() {
 
-    function saveProducts() {
+        const supplier =
+            Number(hargaSupplierInput.value) || 0;
 
-        localStorage.setItem(
-            "queen_products",
-            JSON.stringify(products)
-        );
+        const marginValue =
+            marginInput.value;
 
-    }
+        const biaya =
+            Number(biayaShopeeInput.value) || 0;
 
 
-    /* =========================
-       RENDER TABLE
-    ========================= */
-
-    function renderProducts() {
-
-        const table =
-            document.getElementById("productTable");
-
-        const search =
-            document.getElementById("search")
-                .value
-                .toLowerCase();
-
-        const filter =
-            document.getElementById("filterStatus")
-                .value;
+        let hargaJual = 0;
 
 
-        const filtered =
-            products.filter(product => {
+        /*
+         * AUTO
+         */
 
-                const matchSearch =
-                    product.nama
-                        .toLowerCase()
-                        .includes(search)
+        if (marginValue === "auto") {
 
-                    ||
+            /*
+             * Default Auto = 20%
+             */
 
-                    product.sku
-                        .toLowerCase()
-                        .includes(search);
+            const marginPersen = 20;
 
-
-                const matchStatus =
-                    filter === "all"
-                    ||
-                    product.status === filter;
-
-
-                return matchSearch && matchStatus;
-
-            });
-
-
-        table.innerHTML = "";
-
-
-        if (filtered.length === 0) {
-
-            table.innerHTML = `
-
-                <tr>
-
-                    <td
-                        colspan="7"
-                        class="empty">
-
-                        Tidak ada produk ditemukan.
-
-                    </td>
-
-                </tr>
-
-            `;
+            hargaJual =
+                supplier +
+                (supplier * marginPersen / 100) +
+                biaya;
 
         }
 
 
-        filtered.forEach(product => {
+        /*
+         * MARGIN TERTENTU
+         */
 
-            const margin =
-                product.hargaJual -
-                product.hargaSupplier;
+        else if (marginValue !== "manual") {
 
+            const marginPersen =
+                Number(marginValue);
 
-            const firstLetter =
-                product.nama
-                    .charAt(0)
-                    .toUpperCase();
+            hargaJual =
+                supplier +
+                (supplier * marginPersen / 100) +
+                biaya;
 
-
-            table.innerHTML += `
-
-                <tr>
-
-                    <td>
-
-                        <div class="product">
-
-                            <div class="product-img">
-                                ${firstLetter}
-                            </div>
-
-                            <div>
-
-                                <strong>
-                                    ${escapeHtml(product.nama)}
-                                </strong>
-
-                                <span>
-                                    ${escapeHtml(product.deskripsi || "Produk")}
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </td>
+        }
 
 
-                    <td>
-                        ${escapeHtml(product.sku)}
-                    </td>
+        /*
+         * MANUAL
+         */
+
+        else {
+
+            hargaJual =
+                Number(hargaJualInput.value) || 0;
+
+        }
 
 
-                    <td class="money">
-                        ${rupiah(product.hargaSupplier)}
-                    </td>
+        /*
+         * Tampilkan preview
+         */
+
+        hargaJualPreview.textContent =
+            formatRupiah(hargaJual);
 
 
-                    <td class="money">
-                        ${rupiah(product.hargaJual)}
-                    </td>
+        /*
+         * Isi harga jual otomatis
+         */
+
+        if (marginValue !== "manual") {
+
+            hargaJualInput.value =
+                Math.round(hargaJual);
+
+        }
 
 
-                    <td class="profit">
-                        ${rupiah(margin)}
-                    </td>
-
-
-                    <td>
-
-                        ${
-                            product.status === "active"
-
-                            ?
-
-                            `<span class="status active-status">
-                                Aktif
-                            </span>`
-
-                            :
-
-                            `<span class="status inactive-status">
-                                Nonaktif
-                            </span>`
-                        }
-
-                    </td>
-
-
-                    <td>
-
-                        <div class="actions">
-
-                            <button
-                                class="btn-edit"
-                                onclick="editProduct(${product.id})">
-
-                                Edit
-
-                            </button>
-
-
-                            <button
-                                class="btn-delete"
-                                onclick="deleteProduct(${product.id})">
-
-                                Hapus
-
-                            </button>
-
-                        </div>
-
-                    </td>
-
-                </tr>
-
-            `;
-
-        });
-
-
-        updateSummary();
+        updateProfitPreview();
 
     }
 
 
-    /* =========================
-       SUMMARY
-    ========================= */
+    function updateProfitPreview() {
 
-    function updateSummary() {
+        const supplier =
+            Number(hargaSupplierInput.value) || 0;
 
-        const total =
-            products.length;
-
-
-        const aktif =
-            products.filter(
-                p => p.status === "active"
-            ).length;
+        const jual =
+            Number(hargaJualInput.value) || 0;
 
 
-        let totalMargin = 0;
+        const profit =
+            jual - supplier;
 
 
-        products.forEach(product => {
-
-            totalMargin +=
-                product.hargaJual -
-                product.hargaSupplier;
-
-        });
+        let marginPersen = 0;
 
 
-        const average =
-            total > 0
-            ? totalMargin / total
-            : 0;
+        if (supplier > 0) {
+
+            marginPersen =
+                (profit / supplier) * 100;
+
+        }
 
 
-        document.getElementById(
-            "totalProduk"
-        ).textContent = total;
+        profitPreview.textContent =
+            formatRupiah(profit);
 
 
-        document.getElementById(
-            "produkAktif"
-        ).textContent = aktif;
-
-
-        document.getElementById(
-            "rataMargin"
-        ).textContent = rupiah(average);
-
-
-        document.getElementById(
-            "jumlahHasil"
-        ).textContent =
-            `${total} produk`;
+        marginPreview.textContent =
+            `${marginPersen.toFixed(1)}%`;
 
     }
 
 
-    /* =========================
-       OPEN MODAL
-    ========================= */
+    /*
+     * Saat harga supplier berubah
+     */
 
-    function openModal() {
+    hargaSupplierInput.addEventListener(
+        "input",
+        updatePricePreview
+    );
 
-        document.getElementById(
-            "productModal"
-        ).classList.add("show");
 
+    /*
+     * Saat margin berubah
+     */
 
-        document.getElementById(
-            "modalTitle"
-        ).textContent =
-            "Tambah Produk";
+    marginInput.addEventListener(
+        "change",
+        updatePricePreview
+    );
 
 
-        document.getElementById(
-            "productForm"
-        ).reset();
+    /*
+     * Saat biaya Shopee berubah
+     */
 
+    biayaShopeeInput.addEventListener(
+        "input",
+        updatePricePreview
+    );
 
-        document.getElementById(
-            "editId"
-        ).value = "";
 
-    }
+    /*
+     * Saat harga jual manual berubah
+     */
 
+    hargaJualInput.addEventListener(
+        "input",
+        function() {
 
-    /* =========================
-       CLOSE MODAL
-    ========================= */
+            if (marginInput.value === "manual") {
 
-    function closeModal() {
-
-        document.getElementById(
-            "productModal"
-        ).classList.remove("show");
-
-    }
-
-
-    /* =========================
-       EDIT
-    ========================= */
-
-    function editProduct(id) {
-
-        const product =
-            products.find(
-                p => p.id === id
-            );
-
-
-        if (!product) return;
-
-
-        document.getElementById(
-            "productModal"
-        ).classList.add("show");
-
-
-        document.getElementById(
-            "modalTitle"
-        ).textContent =
-            "Edit Produk";
-
-
-        document.getElementById(
-            "editId"
-        ).value =
-            product.id;
-
-
-        document.getElementById(
-            "nama"
-        ).value =
-            product.nama;
-
-
-        document.getElementById(
-            "sku"
-        ).value =
-            product.sku;
-
-
-        document.getElementById(
-            "hargaSupplier"
-        ).value =
-            product.hargaSupplier;
-
-
-        document.getElementById(
-            "hargaJual"
-        ).value =
-            product.hargaJual;
-
-
-        document.getElementById(
-            "status"
-        ).value =
-            product.status;
-
-
-        document.getElementById(
-            "deskripsi"
-        ).value =
-            product.deskripsi || "";
-
-    }
-
-
-    /* =========================
-       DELETE
-    ========================= */
-
-    function deleteProduct(id) {
-
-        const product =
-            products.find(
-                p => p.id === id
-            );
-
-
-        if (!product) return;
-
-
-        const confirmDelete =
-            confirm(
-                `Hapus produk "${product.nama}"?`
-            );
-
-
-        if (!confirmDelete) return;
-
-
-        products =
-            products.filter(
-                p => p.id !== id
-            );
-
-
-        saveProducts();
-
-        renderProducts();
-
-    }
-
-
-    /* =========================
-       FORM SUBMIT
-    ========================= */
-
-    document
-        .getElementById("productForm")
-        .addEventListener("submit", function(event) {
-
-            event.preventDefault();
-
-
-            const editId =
-                document.getElementById(
-                    "editId"
-                ).value;
-
-
-            const nama =
-                document.getElementById(
-                    "nama"
-                ).value.trim();
-
-
-            const sku =
-                document.getElementById(
-                    "sku"
-                ).value.trim();
-
-
-            const hargaSupplier =
-                Number(
-                    document.getElementById(
-                        "hargaSupplier"
-                    ).value
-                );
-
-
-            const hargaJual =
-                Number(
-                    document.getElementById(
-                        "hargaJual"
-                    ).value
-                );
-
-
-            const status =
-                document.getElementById(
-                    "status"
-                ).value;
-
-
-            const deskripsi =
-                document.getElementById(
-                    "deskripsi"
-                ).value.trim();
-
-
-            if (hargaJual < hargaSupplier) {
-
-                alert(
-                    "Harga jual tidak boleh lebih kecil dari harga supplier."
-                );
-
-                return;
+                updateProfitPreview();
 
             }
 
-
-            if (editId) {
-
-                const product =
-                    products.find(
-                        p =>
-                            p.id === Number(editId)
-                    );
+        }
+    );
 
 
-                if (product) {
+    /*
+     * Saat memilih Manual,
+     * harga jual bisa diketik sendiri.
+     */
 
-                    product.nama =
-                        nama;
+    marginInput.addEventListener(
+        "change",
+        function() {
 
-                    product.sku =
-                        sku;
+            if (this.value === "manual") {
 
-                    product.hargaSupplier =
-                        hargaSupplier;
+                hargaJualInput.removeAttribute(
+                    "readonly"
+                );
 
-                    product.hargaJual =
-                        hargaJual;
-
-                    product.status =
-                        status;
-
-                    product.deskripsi =
-                        deskripsi;
-
-                }
+                hargaJualInput.focus();
 
             } else {
 
-                products.push({
+                hargaJualInput.removeAttribute(
+                    "readonly"
+                );
 
-                    id:
-                        Date.now(),
-
-                    nama,
-
-                    sku,
-
-                    hargaSupplier,
-
-                    hargaJual,
-
-                    status,
-
-                    deskripsi
-
-                });
+                updatePricePreview();
 
             }
 
-
-            saveProducts();
-
-            renderProducts();
-
-            closeModal();
-
-        });
-
-
-    /* =========================
-       SEARCH
-    ========================= */
-
-    document
-        .getElementById("search")
-        .addEventListener(
-            "input",
-            renderProducts
-        );
-
-
-    /* =========================
-       FILTER
-    ========================= */
-
-    document
-        .getElementById("filterStatus")
-        .addEventListener(
-            "change",
-            renderProducts
-        );
-
-
-    /* =========================
-       ESCAPE HTML
-    ========================= */
-
-    function escapeHtml(value) {
-
-        return String(value)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-
-    }
+        }
+    );
 
 
     /* =========================
@@ -1758,11 +1638,11 @@
         );
 
 
-    /* =========================
-       START
-    ========================= */
+    /*
+     * Preview pertama
+     */
 
-    renderProducts();
+    updatePricePreview();
 
 </script>
 
