@@ -9,9 +9,6 @@
     <link rel="stylesheet" href="css/style.css">
 
     <style>
-        /* =====================================================
-           RESET
-        ===================================================== */
         * {
             margin: 0;
             padding: 0;
@@ -212,17 +209,6 @@
             position: relative;
         }
 
-        .notification::after {
-            content: "";
-            width: 7px;
-            height: 7px;
-            background: #ff7a00;
-            border-radius: 50%;
-            position: absolute;
-            top: 8px;
-            right: 8px;
-        }
-
         .profile {
             display: flex;
             align-items: center;
@@ -261,11 +247,17 @@
         }
 
         /* =====================================================
-           WELCOME CARD
+           WELCOME
         ===================================================== */
 
         .welcome {
-            background: linear-gradient(135deg, #111827 0%, #172554 55%, #0066ff 100%);
+            background: linear-gradient(
+                135deg,
+                #111827 0%,
+                #172554 55%,
+                #0066ff 100%
+            );
+
             color: white;
             border-radius: 18px;
             padding: 28px;
@@ -452,21 +444,30 @@
             border-bottom: 1px solid #e5e7eb;
         }
 
-        .chart::before,
-        .chart::after {
-            content: "";
+        .chart-grid-line {
             position: absolute;
             left: 0;
             right: 0;
             border-top: 1px dashed #e5e7eb;
         }
 
-        .chart::before {
+        .chart-line-1 {
             top: 70px;
         }
 
-        .chart::after {
+        .chart-line-2 {
             top: 145px;
+        }
+
+        .chart-empty {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 13px;
+            text-align: center;
         }
 
         .bar-wrap {
@@ -482,13 +483,21 @@
             width: 65%;
             max-width: 42px;
             border-radius: 7px 7px 0 0;
-            background: linear-gradient(180deg, #0066ff, #4f8cff);
-            min-height: 15px;
+            background: linear-gradient(
+                180deg,
+                #0066ff,
+                #4f8cff
+            );
+            min-height: 2px;
             transition: .3s;
         }
 
         .bar:hover {
-            background: linear-gradient(180deg, #ff7a00, #ff9b45);
+            background: linear-gradient(
+                180deg,
+                #ff7a00,
+                #ff9b45
+            );
         }
 
         .bar-label {
@@ -596,7 +605,11 @@
             width: 34px;
             height: 34px;
             border-radius: 8px;
-            background: linear-gradient(135deg, #ff7a00, #0066ff);
+            background: linear-gradient(
+                135deg,
+                #ff7a00,
+                #0066ff
+            );
             color: white;
             display: flex;
             align-items: center;
@@ -644,11 +657,18 @@
             font-weight: 700;
         }
 
+        .empty-row {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+        }
+
         /* =====================================================
            RESPONSIVE
         ===================================================== */
 
         @media (max-width: 1100px) {
+
             .stats {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -659,6 +679,7 @@
         }
 
         @media (max-width: 800px) {
+
             .sidebar {
                 transform: translateX(-100%);
                 transition: .25s;
@@ -700,6 +721,7 @@
         }
 
         @media (max-width: 550px) {
+
             .stats {
                 grid-template-columns: 1fr;
             }
@@ -730,57 +752,111 @@
     <!-- =====================================================
          SIDEBAR
     ====================================================== -->
+
     <aside class="sidebar" id="sidebar">
 
         <div class="logo">
-            <div class="logo-icon">Q</div>
+
+            <div class="logo-icon">
+                Q
+            </div>
 
             <div class="logo-text">
-                <h2>Queen Dropship</h2>
-                <span>Management System</span>
+
+                <h2>
+                    Queen Dropship
+                </h2>
+
+                <span>
+                    Management System
+                </span>
+
             </div>
+
         </div>
+
 
         <nav class="menu">
 
-            <div class="menu-title">Menu Utama</div>
+            <div class="menu-title">
+                Menu Utama
+            </div>
+
 
             <a href="index.html" class="active">
-                <span class="menu-icon">⌂</span>
+
+                <span class="menu-icon">
+                    ⌂
+                </span>
+
                 Dashboard
+
             </a>
+
 
             <a href="produk.html">
-                <span class="menu-icon">▣</span>
+
+                <span class="menu-icon">
+                    ▣
+                </span>
+
                 Produk
+
             </a>
+
 
             <a href="supplier.html">
-                <span class="menu-icon">▤</span>
+
+                <span class="menu-icon">
+                    ▤
+                </span>
+
                 Supplier
+
             </a>
+
 
             <a href="penjualan.html">
-                <span class="menu-icon">🛒</span>
+
+                <span class="menu-icon">
+                    🛒
+                </span>
+
                 Barang Terjual
+
             </a>
+
 
             <a href="pembelian.html">
-                <span class="menu-icon">📦</span>
+
+                <span class="menu-icon">
+                    📦
+                </span>
+
                 Pembelian
+
             </a>
 
+
             <a href="laporan.html">
-                <span class="menu-icon">▥</span>
+
+                <span class="menu-icon">
+                    ▥
+                </span>
+
                 Laporan
+
             </a>
 
         </nav>
 
+
         <div class="sidebar-bottom">
+
             <div class="version">
                 Queen Dropship v1.0
             </div>
+
         </div>
 
     </aside>
@@ -789,28 +865,47 @@
     <!-- =====================================================
          MAIN
     ====================================================== -->
+
     <main class="main">
 
+
         <!-- TOPBAR -->
+
         <header class="topbar">
 
             <button
                 class="mobile-menu"
                 id="mobileMenu"
-                aria-label="Buka menu">
+                type="button"
+                aria-label="Buka menu"
+            >
                 ☰
             </button>
 
+
             <div class="topbar-left">
-                <h1>Dashboard</h1>
-                <p id="currentDate">Memuat tanggal...</p>
+
+                <h1>
+                    Dashboard
+                </h1>
+
+                <p id="currentDate">
+                    Memuat tanggal...
+                </p>
+
             </div>
+
 
             <div class="topbar-right">
 
-                <button class="notification" title="Notifikasi">
+                <button
+                    class="notification"
+                    type="button"
+                    title="Notifikasi"
+                >
                     🔔
                 </button>
+
 
                 <div class="profile">
 
@@ -819,8 +914,15 @@
                     </div>
 
                     <div class="profile-info">
-                        <strong>Admin</strong>
-                        <span>Administrator</span>
+
+                        <strong>
+                            Admin
+                        </strong>
+
+                        <span>
+                            Administrator
+                        </span>
+
                     </div>
 
                 </div>
@@ -830,19 +932,29 @@
         </header>
 
 
-        <!-- CONTENT -->
+        <!-- =====================================================
+             CONTENT
+        ====================================================== -->
+
         <section class="content">
 
+
             <!-- WELCOME -->
+
             <div class="welcome">
 
                 <div class="welcome-content">
-                    <h2>Selamat datang 👋</h2>
+
+                    <h2>
+                        Selamat datang 👋
+                    </h2>
 
                     <p>
                         Kelola bisnis dropship kamu dengan lebih mudah.
-                        Pantau penjualan, pembelian, dan keuntungan dalam satu tempat.
+                        Pantau penjualan, pembelian, dan keuntungan
+                        dalam satu tempat.
                     </p>
+
                 </div>
 
             </div>
@@ -851,26 +963,35 @@
             <!-- =================================================
                  STATISTICS
             ================================================== -->
+
             <div class="stats">
 
+
                 <!-- OMZET -->
+
                 <div class="stat-card">
 
                     <div class="stat-top">
 
                         <div>
+
                             <div class="stat-label">
                                 Total Omzet
                             </div>
 
-                            <div class="stat-value" id="totalOmzet">
+                            <div
+                                class="stat-value"
+                                id="totalOmzet"
+                            >
                                 Rp 0
                             </div>
 
                             <div class="stat-change up">
-                                ↑ Pendapatan penjualan
+                                Pendapatan penjualan
                             </div>
+
                         </div>
+
 
                         <div class="stat-icon orange">
                             💰
@@ -882,23 +1003,30 @@
 
 
                 <!-- MODAL -->
+
                 <div class="stat-card">
 
                     <div class="stat-top">
 
                         <div>
+
                             <div class="stat-label">
                                 Total Modal
                             </div>
 
-                            <div class="stat-value" id="totalModal">
+                            <div
+                                class="stat-value"
+                                id="totalModal"
+                            >
                                 Rp 0
                             </div>
 
                             <div class="stat-change neutral">
                                 Pembelian supplier
                             </div>
+
                         </div>
+
 
                         <div class="stat-icon blue">
                             📦
@@ -910,23 +1038,30 @@
 
 
                 <!-- PROFIT -->
+
                 <div class="stat-card">
 
                     <div class="stat-top">
 
                         <div>
+
                             <div class="stat-label">
                                 Profit
                             </div>
 
-                            <div class="stat-value" id="totalProfit">
+                            <div
+                                class="stat-value"
+                                id="totalProfit"
+                            >
                                 Rp 0
                             </div>
 
                             <div class="stat-change up">
-                                ↑ Keuntungan kotor
+                                Keuntungan kotor
                             </div>
+
                         </div>
+
 
                         <div class="stat-icon green">
                             📈
@@ -937,24 +1072,31 @@
                 </div>
 
 
-                <!-- BARANG -->
+                <!-- BARANG TERJUAL -->
+
                 <div class="stat-card">
 
                     <div class="stat-top">
 
                         <div>
+
                             <div class="stat-label">
                                 Barang Terjual
                             </div>
 
-                            <div class="stat-value" id="totalTerjual">
+                            <div
+                                class="stat-value"
+                                id="totalTerjual"
+                            >
                                 0
                             </div>
 
                             <div class="stat-change neutral">
                                 Total unit terjual
                             </div>
+
                         </div>
+
 
                         <div class="stat-icon purple">
                             🛒
@@ -970,60 +1112,61 @@
             <!-- =================================================
                  CHART + QUICK ACTION
             ================================================== -->
+
             <div class="dashboard-grid">
 
+
                 <!-- CHART -->
+
                 <div class="card">
 
                     <div class="card-header">
 
                         <div>
-                            <h3>Penjualan</h3>
-                            <span>Ringkasan penjualan</span>
+
+                            <h3>
+                                Penjualan
+                            </h3>
+
+                            <span>
+                                Data penjualan dari database
+                            </span>
+
                         </div>
 
-                        <select class="select" id="chartPeriod">
-                            <option value="7">7 Hari</option>
-                            <option value="30">30 Hari</option>
+
+                        <select
+                            class="select"
+                            id="chartPeriod"
+                        >
+
+                            <option value="7">
+                                7 Hari
+                            </option>
+
+                            <option value="30">
+                                30 Hari
+                            </option>
+
                         </select>
 
                     </div>
 
-                    <div class="chart">
 
-                        <div class="bar-wrap">
-                            <div class="bar" style="height:35%;"></div>
-                            <span class="bar-label">Sen</span>
-                        </div>
+                    <div
+                        class="chart"
+                        id="salesChart"
+                    >
 
-                        <div class="bar-wrap">
-                            <div class="bar" style="height:55%;"></div>
-                            <span class="bar-label">Sel</span>
-                        </div>
+                        <div class="chart-grid-line chart-line-1"></div>
 
-                        <div class="bar-wrap">
-                            <div class="bar" style="height:40%;"></div>
-                            <span class="bar-label">Rab</span>
-                        </div>
+                        <div class="chart-grid-line chart-line-2"></div>
 
-                        <div class="bar-wrap">
-                            <div class="bar" style="height:75%;"></div>
-                            <span class="bar-label">Kam</span>
-                        </div>
-
-                        <div class="bar-wrap">
-                            <div class="bar" style="height:60%;"></div>
-                            <span class="bar-label">Jum</span>
-                        </div>
-
-                        <div class="bar-wrap">
-                            <div class="bar" style="height:90%;"></div>
-                            <span class="bar-label">Sab</span>
-                        </div>
-
-                        <div class="bar-wrap">
-                            <div class="bar" style="height:70%;"></div>
-                            <span class="bar-label">Min</span>
+                        <div
+                            class="chart-empty"
+                            id="chartEmpty"
+                        >
+                            Belum ada data penjualan
                         </div>
 
                     </div>
@@ -1032,28 +1175,49 @@
 
 
                 <!-- QUICK ACTION -->
+
                 <div class="card">
 
                     <div class="card-header">
+
                         <div>
-                            <h3>Aksi Cepat</h3>
-                            <span>Kelola toko</span>
+
+                            <h3>
+                                Aksi Cepat
+                            </h3>
+
+                            <span>
+                                Kelola toko
+                            </span>
+
                         </div>
+
                     </div>
+
 
                     <div class="quick-list">
 
+
                         <button
                             class="quick-btn"
-                            onclick="window.location.href='produk.html'">
+                            type="button"
+                            onclick="window.location.href='produk.html'"
+                        >
 
                             <div class="quick-icon">
                                 +
                             </div>
 
                             <div>
-                                <strong>Tambah Produk</strong>
-                                <span>Tambahkan barang baru</span>
+
+                                <strong>
+                                    Tambah Produk
+                                </strong>
+
+                                <span>
+                                    Tambahkan barang baru
+                                </span>
+
                             </div>
 
                         </button>
@@ -1061,15 +1225,24 @@
 
                         <button
                             class="quick-btn"
-                            onclick="window.location.href='penjualan.html'">
+                            type="button"
+                            onclick="window.location.href='penjualan.html'"
+                        >
 
                             <div class="quick-icon">
                                 🛒
                             </div>
 
                             <div>
-                                <strong>Catat Penjualan</strong>
-                                <span>Masukkan barang terjual</span>
+
+                                <strong>
+                                    Catat Penjualan
+                                </strong>
+
+                                <span>
+                                    Masukkan barang terjual
+                                </span>
+
                             </div>
 
                         </button>
@@ -1077,15 +1250,24 @@
 
                         <button
                             class="quick-btn"
-                            onclick="window.location.href='pembelian.html'">
+                            type="button"
+                            onclick="window.location.href='pembelian.html'"
+                        >
 
                             <div class="quick-icon">
                                 📦
                             </div>
 
                             <div>
-                                <strong>Catat Pembelian</strong>
-                                <span>Order ke supplier</span>
+
+                                <strong>
+                                    Catat Pembelian
+                                </strong>
+
+                                <span>
+                                    Order ke supplier
+                                </span>
+
                             </div>
 
                         </button>
@@ -1093,15 +1275,24 @@
 
                         <button
                             class="quick-btn"
-                            onclick="window.location.href='laporan.html'">
+                            type="button"
+                            onclick="window.location.href='laporan.html'"
+                        >
 
                             <div class="quick-icon">
                                 📊
                             </div>
 
                             <div>
-                                <strong>Lihat Laporan</strong>
-                                <span>Cek profit toko</span>
+
+                                <strong>
+                                    Lihat Laporan
+                                </strong>
+
+                                <span>
+                                    Cek profit toko
+                                </span>
+
                             </div>
 
                         </button>
@@ -1114,16 +1305,25 @@
 
 
             <!-- =================================================
-                 RECENT SALES
+                 PENJUALAN TERBARU
             ================================================== -->
+
             <div class="card table-card">
 
                 <div class="card-header">
 
                     <div>
-                        <h3>Penjualan Terbaru</h3>
-                        <span>Transaksi terakhir</span>
+
+                        <h3>
+                            Penjualan Terbaru
+                        </h3>
+
+                        <span>
+                            Transaksi terakhir dari database
+                        </span>
+
                     </div>
+
 
                     <a
                         href="penjualan.html"
@@ -1131,7 +1331,8 @@
                             color:#0066ff;
                             font-size:12px;
                             font-weight:600;
-                        ">
+                        "
+                    >
                         Lihat Semua →
                     </a>
 
@@ -1143,126 +1344,53 @@
                     <table>
 
                         <thead>
+
                             <tr>
-                                <th>ORDER</th>
-                                <th>PRODUK</th>
-                                <th>QTY</th>
-                                <th>HARGA JUAL</th>
-                                <th>TOTAL</th>
-                                <th>STATUS</th>
+
+                                <th>
+                                    ORDER
+                                </th>
+
+                                <th>
+                                    PRODUK
+                                </th>
+
+                                <th>
+                                    QTY
+                                </th>
+
+                                <th>
+                                    HARGA JUAL
+                                </th>
+
+                                <th>
+                                    TOTAL
+                                </th>
+
+                                <th>
+                                    STATUS
+                                </th>
+
                             </tr>
+
                         </thead>
+
 
                         <tbody id="salesTable">
 
-                            <!-- Data akan diisi JS -->
+                            <!--
+                                Tidak ada dummy data.
+                                Data akan dimasukkan oleh
+                                js/index.js dari server.js.
+                            -->
 
                             <tr>
-                                <td>#ORD-001</td>
 
-                                <td>
-                                    <div class="product-name">
-
-                                        <div class="product-image">
-                                            K
-                                        </div>
-
-                                        <div>
-                                            <strong>Kaos Basic</strong>
-                                            <span>Produk</span>
-                                        </div>
-
-                                    </div>
-                                </td>
-
-                                <td>2</td>
-
-                                <td class="money">
-                                    Rp 59.000
-                                </td>
-
-                                <td class="money">
-                                    Rp 118.000
-                                </td>
-
-                                <td>
-                                    <span class="status status-success">
-                                        Selesai
-                                    </span>
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-                                <td>#ORD-002</td>
-
-                                <td>
-                                    <div class="product-name">
-
-                                        <div class="product-image">
-                                            T
-                                        </div>
-
-                                        <div>
-                                            <strong>Tumbler</strong>
-                                            <span>Produk</span>
-                                        </div>
-
-                                    </div>
-                                </td>
-
-                                <td>1</td>
-
-                                <td class="money">
-                                    Rp 69.000
-                                </td>
-
-                                <td class="money">
-                                    Rp 69.000
-                                </td>
-
-                                <td>
-                                    <span class="status status-process">
-                                        Dikirim
-                                    </span>
-                                </td>
-
-                            </tr>
-
-
-                            <tr>
-                                <td>#ORD-003</td>
-
-                                <td>
-                                    <div class="product-name">
-
-                                        <div class="product-image">
-                                            B
-                                        </div>
-
-                                        <div>
-                                            <strong>Botol Minum</strong>
-                                            <span>Produk</span>
-                                        </div>
-
-                                    </div>
-                                </td>
-
-                                <td>3</td>
-
-                                <td class="money">
-                                    Rp 45.000
-                                </td>
-
-                                <td class="money">
-                                    Rp 135.000
-                                </td>
-
-                                <td>
-                                    <span class="status status-wait">
-                                        Diproses
-                                    </span>
+                                <td
+                                    colspan="6"
+                                    class="empty-row"
+                                >
+                                    Belum ada transaksi penjualan
                                 </td>
 
                             </tr>
@@ -1283,56 +1411,17 @@
 
 
 <!-- =========================================================
-     JAVASCRIPT DASAR
+     JAVASCRIPT
 ========================================================== -->
 
 <script>
 
     /*
-     * Jam dan tanggal
+     * Format Rupiah
      */
-    function updateDate() {
+    function formatRupiah(value) {
 
-        const dateElement =
-            document.getElementById("currentDate");
-
-        const now = new Date();
-
-        const options = {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric"
-        };
-
-        dateElement.textContent =
-            now.toLocaleDateString("id-ID", options);
-    }
-
-    updateDate();
-
-
-    /*
-     * Mobile sidebar
-     */
-    const mobileMenu =
-        document.getElementById("mobileMenu");
-
-    const sidebar =
-        document.getElementById("sidebar");
-
-    mobileMenu.addEventListener("click", function () {
-
-        sidebar.classList.toggle("open");
-
-    });
-
-
-    /*
-     * Contoh formatter Rupiah.
-     * Nanti bisa digunakan oleh index.js.
-     */
-    function formatRupiah(number) {
+        const number = Number(value) || 0;
 
         return new Intl.NumberFormat("id-ID", {
             style: "currency",
@@ -1344,66 +1433,497 @@
 
 
     /*
-     * Data sementara.
-     *
-     * Nanti bagian ini bisa diganti dengan:
-     *
-     * fetch("/api/dashboard")
-     *
-     * dari server.js.
+     * Tanggal sekarang
      */
-    const dashboardDemo = {
+    function updateDate() {
 
-        omzet: 0,
+        const element =
+            document.getElementById("currentDate");
 
-        modal: 0,
+        const now = new Date();
 
-        profit: 0,
-
-        terjual: 0
-
-    };
-
-
-    /*
-     * Fungsi update dashboard.
-     */
-    function updateDashboard(data) {
-
-        document.getElementById("totalOmzet")
-            .textContent = formatRupiah(data.omzet);
-
-        document.getElementById("totalModal")
-            .textContent = formatRupiah(data.modal);
-
-        document.getElementById("totalProfit")
-            .textContent = formatRupiah(data.profit);
-
-        document.getElementById("totalTerjual")
-            .textContent = data.terjual;
+        element.textContent =
+            now.toLocaleDateString(
+                "id-ID",
+                {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric"
+                }
+            );
 
     }
 
 
     /*
-     * Data awal.
-     * Saat server.js sudah dibuat,
-     * fungsi ini tinggal diganti dengan data database.
+     * Mobile menu
      */
-    updateDashboard(dashboardDemo);
+    const mobileMenu =
+        document.getElementById("mobileMenu");
 
+    const sidebar =
+        document.getElementById("sidebar");
+
+
+    if (mobileMenu && sidebar) {
+
+        mobileMenu.addEventListener(
+            "click",
+            function () {
+
+                sidebar.classList.toggle("open");
+
+            }
+        );
+
+    }
+
+
+    /*
+     * Menutup sidebar ketika link diklik
+     * pada perangkat mobile.
+     */
+    document
+        .querySelectorAll(".menu a")
+        .forEach(function(link) {
+
+            link.addEventListener(
+                "click",
+                function() {
+
+                    if (
+                        window.innerWidth <= 800
+                    ) {
+
+                        sidebar.classList.remove(
+                            "open"
+                        );
+
+                    }
+
+                }
+            );
+
+        });
+
+
+    /*
+     * Update statistik dashboard
+     */
+    function updateStatistics(data) {
+
+        document.getElementById(
+            "totalOmzet"
+        ).textContent =
+            formatRupiah(data.omzet);
+
+        document.getElementById(
+            "totalModal"
+        ).textContent =
+            formatRupiah(data.modal);
+
+        document.getElementById(
+            "totalProfit"
+        ).textContent =
+            formatRupiah(data.profit);
+
+        document.getElementById(
+            "totalTerjual"
+        ).textContent =
+            Number(data.terjual) || 0;
+
+    }
+
+
+    /*
+     * Membuat chart berdasarkan data
+     * yang dikirim server.
+     */
+    function renderChart(data) {
+
+        const chart =
+            document.getElementById(
+                "salesChart"
+            );
+
+        const empty =
+            document.getElementById(
+                "chartEmpty"
+            );
+
+
+        chart
+            .querySelectorAll(".bar-wrap")
+            .forEach(function(element) {
+                element.remove();
+            });
+
+
+        if (
+            !Array.isArray(data) ||
+            data.length === 0
+        ) {
+
+            empty.style.display = "flex";
+
+            return;
+        }
+
+
+        empty.style.display = "none";
+
+
+        const values =
+            data.map(function(item) {
+
+                return Number(
+                    item.total
+                ) || 0;
+
+            });
+
+
+        const max =
+            Math.max(...values, 1);
+
+
+        data.forEach(function(item) {
+
+            const value =
+                Number(item.total) || 0;
+
+
+            const percentage =
+                (value / max) * 100;
+
+
+            const wrapper =
+                document.createElement("div");
+
+            wrapper.className =
+                "bar-wrap";
+
+
+            const bar =
+                document.createElement("div");
+
+            bar.className =
+                "bar";
+
+            bar.style.height =
+                Math.max(
+                    percentage,
+                    2
+                ) + "%";
+
+
+            const label =
+                document.createElement("span");
+
+            label.className =
+                "bar-label";
+
+            label.textContent =
+                item.label || "";
+
+
+            wrapper.appendChild(bar);
+
+            wrapper.appendChild(label);
+
+            chart.appendChild(wrapper);
+
+        });
+
+    }
+
+
+    /*
+     * Render transaksi terbaru.
+     */
+    function renderRecentSales(data) {
+
+        const table =
+            document.getElementById(
+                "salesTable"
+            );
+
+
+        table.innerHTML = "";
+
+
+        if (
+            !Array.isArray(data) ||
+            data.length === 0
+        ) {
+
+            table.innerHTML = `
+                <tr>
+                    <td
+                        colspan="6"
+                        class="empty-row"
+                    >
+                        Belum ada transaksi penjualan
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+
+        data.forEach(function(item) {
+
+            const row =
+                document.createElement("tr");
+
+
+            const productName =
+                item.produk || "-";
+
+
+            const initial =
+                productName
+                    .charAt(0)
+                    .toUpperCase();
+
+
+            let statusClass =
+                "status-process";
+
+
+            const status =
+                String(
+                    item.status || ""
+                ).toLowerCase();
+
+
+            if (
+                status === "selesai" ||
+                status === "completed"
+            ) {
+
+                statusClass =
+                    "status-success";
+
+            }
+            else if (
+                status === "menunggu" ||
+                status === "pending"
+            ) {
+
+                statusClass =
+                    "status-wait";
+
+            }
+
+
+            row.innerHTML = `
+
+                <td>
+                    ${escapeHTML(
+                        item.order_id || "-"
+                    )}
+                </td>
+
+                <td>
+
+                    <div class="product-name">
+
+                        <div class="product-image">
+                            ${escapeHTML(initial)}
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                ${escapeHTML(
+                                    productName
+                                )}
+                            </strong>
+
+                            <span>
+                                Produk
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </td>
+
+                <td>
+                    ${Number(item.qty) || 0}
+                </td>
+
+                <td class="money">
+                    ${formatRupiah(
+                        item.harga_jual
+                    )}
+                </td>
+
+                <td class="money">
+                    ${formatRupiah(
+                        item.total
+                    )}
+                </td>
+
+                <td>
+
+                    <span
+                        class="status ${statusClass}"
+                    >
+                        ${escapeHTML(
+                            item.status || "-"
+                        )}
+                    </span>
+
+                </td>
+
+            `;
+
+
+            table.appendChild(row);
+
+        });
+
+    }
+
+
+    /*
+     * Mencegah teks dari database
+     * dianggap sebagai HTML.
+     */
+    function escapeHTML(value) {
+
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+
+    /*
+     * Ambil dashboard dari server.
+     *
+     * TIDAK ADA DATA DUMMY.
+     *
+     * Endpoint ini akan dibuat di server.js.
+     */
+    async function loadDashboard() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/dashboard"
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Gagal mengambil data dashboard"
+                );
+
+            }
+
+
+            const result =
+                await response.json();
+
+
+            /*
+             * Statistik
+             */
+            updateStatistics(
+                result.statistics || {
+                    omzet: 0,
+                    modal: 0,
+                    profit: 0,
+                    terjual: 0
+                }
+            );
+
+
+            /*
+             * Grafik
+             */
+            renderChart(
+                result.chart || []
+            );
+
+
+            /*
+             * Penjualan terbaru
+             */
+            renderRecentSales(
+                result.recentSales || []
+            );
+
+        }
+        catch (error) {
+
+            console.error(
+                "Dashboard:",
+                error
+            );
+
+
+            /*
+             * Jika server/database belum aktif,
+             * tetap tampilkan angka kosong.
+             */
+
+            updateStatistics({
+
+                omzet: 0,
+
+                modal: 0,
+
+                profit: 0,
+
+                terjual: 0
+
+            });
+
+
+            renderChart([]);
+
+            renderRecentSales([]);
+
+        }
+
+    }
+
+
+    /*
+     * Jalankan ketika halaman selesai.
+     */
+    updateDate();
+
+    loadDashboard();
+
+
+    /*
+     * Refresh ketika pilihan periode berubah.
+     */
+    document
+        .getElementById("chartPeriod")
+        .addEventListener(
+            "change",
+            function() {
+
+                loadDashboard();
+
+            }
+        );
 
 </script>
-
-<!--
-    Nantinya file JS eksternal:
-    
-    <script src="js/index.js"></script>
-
-    bisa digunakan untuk mengambil data dari:
-
-    server.js
--->
 
 </body>
 </html>
