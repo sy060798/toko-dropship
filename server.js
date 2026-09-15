@@ -2,57 +2,64 @@
 
 /*
 ===========================================================
- QUEEN DROPSHIP - FULL BACKEND
+ QUEEN DROPSHIP API
 ===========================================================
 
-Modul:
-
-/api/ping
-/api/test
-
-/api/produk
-/api/supplier
-/api/penjualan
-/api/pembelian
-
-/api/dashboard
-/api/laporan
-
-Method:
-
-GET
-POST
-PUT
-DELETE
-
-Database:
-
+DATABASE:
 CockroachDB / PostgreSQL
 
-Environment:
-
+ENVIRONMENT:
 DATABASE_URL
+PORT
 
-Contoh:
+ENDPOINTS:
 
-DATABASE_URL=postgresql://user:password@host:26257/defaultdb?sslmode=verify-full
+GET    /api/ping
+GET    /api/test
+
+GET    /api/produk
+POST   /api/produk
+PUT    /api/produk/:id
+DELETE /api/produk/:id
+
+GET    /api/supplier
+POST   /api/supplier
+PUT    /api/supplier/:id
+DELETE /api/supplier/:id
+
+GET    /api/penjualan
+POST   /api/penjualan
+PUT    /api/penjualan/:id
+DELETE /api/penjualan/:id
+
+GET    /api/pembelian
+POST   /api/pembelian
+PUT    /api/pembelian/:id
+DELETE /api/pembelian/:id
+
+GET    /api/dashboard
+GET    /api/laporan
 
 ===========================================================
 */
 
 const http = require("http");
 const { Pool } = require("pg");
+const { URL } = require("url");
 
 
 // =========================================================
 // CONFIG
 // =========================================================
 
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
-const DATABASE_URL =
-    process.env.DATABASE_URL;
+const DATABASE_URL = process.env.DATABASE_URL;
 
+
+// =========================================================
+// VALIDASI DATABASE
+// =========================================================
 
 if (!DATABASE_URL) {
 
@@ -61,7 +68,6 @@ if (!DATABASE_URL) {
     );
 
     process.exit(1);
-
 }
 
 
@@ -71,8 +77,7 @@ if (!DATABASE_URL) {
 
 const pool = new Pool({
 
-    connectionString:
-        DATABASE_URL,
+    connectionString: DATABASE_URL,
 
     ssl: {
         rejectUnauthorized: true
@@ -85,6 +90,136 @@ const pool = new Pool({
     connectionTimeoutMillis: 10000
 
 });
+
+
+// =========================================================
+// HELPERS
+// =========================================================
+
+function sendJSON(res, status, data) {
+
+    res.writeHead(status, {
+
+        "Content-Type":
+            "application/json; charset=utf-8",
+
+        "Cache-Control":
+            "no-store",
+
+        "Access-Control-Allow-Origin":
+            "*",
+
+        "Access-Control-Allow-Methods":
+            "GET,POST,PUT,DELETE,OPTIONS",
+
+        "Access-Control-Allow-Headers":
+            "Content-Type"
+
+    });
+
+    res.end(
+        JSON.stringify(data)
+    );
+}
+
+
+function clean(value) {
+
+    if (
+        value === undefined ||
+        value === null
+    ) {
+
+        return "";
+    }
+
+    return String(value).trim();
+}
+
+
+function number(value) {
+
+    const n = Number(value);
+
+    if (!Number.isFinite(n)) {
+
+        return 0;
+    }
+
+    return n;
+}
+
+
+function getRequestBody(req) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            let body = "";
+
+            req.on(
+                "data",
+                chunk => {
+
+                    body += chunk;
+
+                    if (
+                        body.length >
+                        1024 * 1024
+                    ) {
+
+                        reject(
+                            new Error(
+                                "Request terlalu besar."
+                            )
+                        );
+
+                        req.destroy();
+                    }
+                }
+            );
+
+
+            req.on(
+                "end",
+                () => {
+
+                    if (!body.trim()) {
+
+                        resolve({});
+
+                        return;
+                    }
+
+                    try {
+
+                        const data =
+                            JSON.parse(body);
+
+                        resolve(data);
+
+                    } catch (error) {
+
+                        reject(
+                            new Error(
+                                "JSON request tidak valid."
+                            )
+                        );
+                    }
+                }
+            );
+
+
+            req.on(
+                "error",
+                error => {
+
+                    reject(error);
+                }
+            );
+        }
+    );
+}
 
 
 // =========================================================
@@ -131,19 +266,28 @@ const server =
                 res.writeHead(204);
 
                 return res.end();
-
             }
 
 
             try {
 
+                const parsedURL =
+                    new URL(
+                        req.url,
+                        `http://${req.headers.host || "localhost"}`
+                    );
+
+                const pathname =
+                    parsedURL.pathname;
+
+
                 // =================================================
-                // BASIC SERVER TEST
+                // PING
                 // =================================================
 
                 if (
                     req.method === "GET" &&
-                    req.url === "/api/ping"
+                    pathname === "/api/ping"
                 ) {
 
                     return sendJSON(
@@ -151,13 +295,14 @@ const server =
                         200,
                         {
                             success: true,
+
                             message:
                                 "Queen Dropship API aktif",
+
                             time:
                                 new Date().toISOString()
                         }
                     );
-
                 }
 
 
@@ -167,7 +312,7 @@ const server =
 
                 if (
                     req.method === "GET" &&
-                    req.url === "/api/test"
+                    pathname === "/api/test"
                 ) {
 
                     const result =
@@ -175,19 +320,19 @@ const server =
                             "SELECT NOW() AS waktu"
                         );
 
-
                     return sendJSON(
                         res,
                         200,
                         {
                             success: true,
+
                             message:
                                 "Database terhubung",
+
                             waktu:
                                 result.rows[0].waktu
                         }
                     );
-
                 }
 
 
@@ -196,7 +341,7 @@ const server =
                 // =================================================
 
                 if (
-                    req.url === "/api/produk"
+                    pathname === "/api/produk"
                 ) {
 
                     if (
@@ -206,7 +351,6 @@ const server =
                         return await getProduk(
                             res
                         );
-
                     }
 
 
@@ -218,14 +362,12 @@ const server =
                             req,
                             res
                         );
-
                     }
-
                 }
 
 
                 const produkMatch =
-                    req.url.match(
+                    pathname.match(
                         /^\/api\/produk\/(\d+)$/
                     );
 
@@ -247,7 +389,6 @@ const server =
                             res,
                             id
                         );
-
                     }
 
 
@@ -259,9 +400,7 @@ const server =
                             res,
                             id
                         );
-
                     }
-
                 }
 
 
@@ -270,7 +409,7 @@ const server =
                 // =================================================
 
                 if (
-                    req.url === "/api/supplier"
+                    pathname === "/api/supplier"
                 ) {
 
                     if (
@@ -280,7 +419,6 @@ const server =
                         return await getSupplier(
                             res
                         );
-
                     }
 
 
@@ -292,14 +430,12 @@ const server =
                             req,
                             res
                         );
-
                     }
-
                 }
 
 
                 const supplierMatch =
-                    req.url.match(
+                    pathname.match(
                         /^\/api\/supplier\/(\d+)$/
                     );
 
@@ -321,7 +457,6 @@ const server =
                             res,
                             id
                         );
-
                     }
 
 
@@ -333,9 +468,7 @@ const server =
                             res,
                             id
                         );
-
                     }
-
                 }
 
 
@@ -344,7 +477,7 @@ const server =
                 // =================================================
 
                 if (
-                    req.url === "/api/penjualan"
+                    pathname === "/api/penjualan"
                 ) {
 
                     if (
@@ -354,7 +487,6 @@ const server =
                         return await getPenjualan(
                             res
                         );
-
                     }
 
 
@@ -366,14 +498,12 @@ const server =
                             req,
                             res
                         );
-
                     }
-
                 }
 
 
                 const penjualanMatch =
-                    req.url.match(
+                    pathname.match(
                         /^\/api\/penjualan\/(\d+)$/
                     );
 
@@ -395,7 +525,6 @@ const server =
                             res,
                             id
                         );
-
                     }
 
 
@@ -407,9 +536,7 @@ const server =
                             res,
                             id
                         );
-
                     }
-
                 }
 
 
@@ -418,7 +545,7 @@ const server =
                 // =================================================
 
                 if (
-                    req.url === "/api/pembelian"
+                    pathname === "/api/pembelian"
                 ) {
 
                     if (
@@ -428,7 +555,6 @@ const server =
                         return await getPembelian(
                             res
                         );
-
                     }
 
 
@@ -440,14 +566,12 @@ const server =
                             req,
                             res
                         );
-
                     }
-
                 }
 
 
                 const pembelianMatch =
-                    req.url.match(
+                    pathname.match(
                         /^\/api\/pembelian\/(\d+)$/
                     );
 
@@ -469,7 +593,6 @@ const server =
                             res,
                             id
                         );
-
                     }
 
 
@@ -481,9 +604,7 @@ const server =
                             res,
                             id
                         );
-
                     }
-
                 }
 
 
@@ -493,13 +614,12 @@ const server =
 
                 if (
                     req.method === "GET" &&
-                    req.url === "/api/dashboard"
+                    pathname === "/api/dashboard"
                 ) {
 
                     return await getDashboard(
                         res
                     );
-
                 }
 
 
@@ -509,14 +629,13 @@ const server =
 
                 if (
                     req.method === "GET" &&
-                    req.url === "/api/laporan"
+                    pathname === "/api/laporan"
                 ) {
 
                     return await getLaporan(
-                        req,
+                        parsedURL,
                         res
                     );
-
                 }
 
 
@@ -529,10 +648,12 @@ const server =
                     404,
                     {
                         success: false,
+
                         message:
                             "Endpoint tidak ditemukan.",
+
                         endpoint:
-                            req.url
+                            pathname
                     }
                 );
 
@@ -551,16 +672,17 @@ const server =
                     500,
                     {
                         success: false,
+
                         message:
                             error.message ||
                             "Terjadi kesalahan server.",
+
                         code:
-                            error.code || null
+                            error.code ||
+                            null
                     }
                 );
-
             }
-
         }
     );
 
@@ -586,13 +708,11 @@ async function getProduk(res) {
             ORDER BY id DESC
         `);
 
-
     return sendJSON(
         res,
         200,
         result.rows
     );
-
 }
 
 
@@ -614,13 +734,22 @@ async function createProduk(req, res) {
             : "active";
 
     const hargaSupplier =
-        number(body.hargaSupplier);
+        number(
+            body.hargaSupplier ??
+            body.harga_supplier
+        );
 
     const hargaJual =
-        number(body.hargaJual);
+        number(
+            body.hargaJual ??
+            body.harga_jual
+        );
 
     const biayaShopee =
-        number(body.biayaShopee);
+        number(
+            body.biayaShopee ??
+            body.biaya_shopee
+        );
 
     const deskripsi =
         clean(body.deskripsi);
@@ -637,7 +766,6 @@ async function createProduk(req, res) {
                     "Nama produk wajib diisi."
             }
         );
-
     }
 
 
@@ -652,7 +780,6 @@ async function createProduk(req, res) {
                     "SKU wajib diisi."
             }
         );
-
     }
 
 
@@ -679,7 +806,6 @@ async function createProduk(req, res) {
                     "SKU sudah digunakan."
             }
         );
-
     }
 
 
@@ -717,13 +843,14 @@ async function createProduk(req, res) {
         201,
         {
             success: true,
+
             message:
                 "Produk berhasil ditambahkan.",
+
             data:
                 result.rows[0]
         }
     );
-
 }
 
 
@@ -749,13 +876,22 @@ async function updateProduk(
             : "active";
 
     const hargaSupplier =
-        number(body.hargaSupplier);
+        number(
+            body.hargaSupplier ??
+            body.harga_supplier
+        );
 
     const hargaJual =
-        number(body.hargaJual);
+        number(
+            body.hargaJual ??
+            body.harga_jual
+        );
 
     const biayaShopee =
-        number(body.biayaShopee);
+        number(
+            body.biayaShopee ??
+            body.biaya_shopee
+        );
 
     const deskripsi =
         clean(body.deskripsi);
@@ -772,7 +908,6 @@ async function updateProduk(
                     "Nama dan SKU wajib diisi."
             }
         );
-
     }
 
 
@@ -800,7 +935,6 @@ async function updateProduk(
                     "SKU sudah digunakan produk lain."
             }
         );
-
     }
 
 
@@ -843,7 +977,6 @@ async function updateProduk(
                     "Produk tidak ditemukan."
             }
         );
-
     }
 
 
@@ -852,13 +985,14 @@ async function updateProduk(
         200,
         {
             success: true,
+
             message:
                 "Produk berhasil diupdate.",
+
             data:
                 result.rows[0]
         }
     );
-
 }
 
 
@@ -889,7 +1023,6 @@ async function deleteProduk(
                     "Produk tidak ditemukan."
             }
         );
-
     }
 
 
@@ -898,13 +1031,14 @@ async function deleteProduk(
         200,
         {
             success: true,
+
             message:
                 "Produk berhasil dihapus.",
+
             data:
                 result.rows[0]
         }
     );
-
 }
 
 
@@ -921,13 +1055,11 @@ async function getSupplier(res) {
             ORDER BY id DESC
         `);
 
-
     return sendJSON(
         res,
         200,
         result.rows
     );
-
 }
 
 
@@ -957,7 +1089,8 @@ async function createSupplier(req, res) {
         clean(body.email);
 
     const status =
-        body.status || "active";
+        clean(body.status) ||
+        "active";
 
 
     if (!nama) {
@@ -971,7 +1104,6 @@ async function createSupplier(req, res) {
                     "Nama supplier wajib diisi."
             }
         );
-
     }
 
 
@@ -1005,13 +1137,14 @@ async function createSupplier(req, res) {
         201,
         {
             success: true,
+
             message:
                 "Supplier berhasil ditambahkan.",
+
             data:
                 result.rows[0]
         }
     );
-
 }
 
 
@@ -1045,7 +1178,8 @@ async function updateSupplier(
         clean(body.email);
 
     const status =
-        body.status || "active";
+        clean(body.status) ||
+        "active";
 
 
     const result =
@@ -1083,7 +1217,6 @@ async function updateSupplier(
                     "Supplier tidak ditemukan."
             }
         );
-
     }
 
 
@@ -1092,13 +1225,14 @@ async function updateSupplier(
         200,
         {
             success: true,
+
             message:
                 "Supplier berhasil diupdate.",
+
             data:
                 result.rows[0]
         }
     );
-
 }
 
 
@@ -1129,7 +1263,6 @@ async function deleteSupplier(
                     "Supplier tidak ditemukan."
             }
         );
-
     }
 
 
@@ -1138,13 +1271,14 @@ async function deleteSupplier(
         200,
         {
             success: true,
+
             message:
                 "Supplier berhasil dihapus.",
+
             data:
                 result.rows[0]
         }
     );
-
 }
 
 
@@ -1161,13 +1295,11 @@ async function getPenjualan(res) {
             ORDER BY id DESC
         `);
 
-
     return sendJSON(
         res,
         200,
         result.rows
     );
-
 }
 
 
@@ -1182,7 +1314,7 @@ async function createPenjualan(
 
     const produkId =
         number(
-            body.produk_id ||
+            body.produk_id ??
             body.produkId
         );
 
@@ -1191,7 +1323,7 @@ async function createPenjualan(
 
     const hargaJual =
         number(
-            body.harga_jual ||
+            body.harga_jual ??
             body.hargaJual
         );
 
@@ -1217,7 +1349,6 @@ async function createPenjualan(
                     "Produk wajib dipilih."
             }
         );
-
     }
 
 
@@ -1232,7 +1363,6 @@ async function createPenjualan(
                     "Jumlah penjualan tidak valid."
             }
         );
-
     }
 
 
@@ -1266,13 +1396,14 @@ async function createPenjualan(
         201,
         {
             success: true,
+
             message:
                 "Penjualan berhasil disimpan.",
+
             data:
                 result.rows[0]
         }
     );
-
 }
 
 
@@ -1288,7 +1419,7 @@ async function updatePenjualan(
 
     const produkId =
         number(
-            body.produk_id ||
+            body.produk_id ??
             body.produkId
         );
 
@@ -1297,7 +1428,7 @@ async function updatePenjualan(
 
     const hargaJual =
         number(
-            body.harga_jual ||
+            body.harga_jual ??
             body.hargaJual
         );
 
@@ -1308,7 +1439,8 @@ async function updatePenjualan(
 
     const tanggal =
         body.tanggal ||
-        body.tanggal_penjualan;
+        body.tanggal_penjualan ||
+        new Date().toISOString();
 
 
     const result =
@@ -1346,7 +1478,6 @@ async function updatePenjualan(
                     "Penjualan tidak ditemukan."
             }
         );
-
     }
 
 
@@ -1355,13 +1486,14 @@ async function updatePenjualan(
         200,
         {
             success: true,
+
             message:
                 "Penjualan berhasil diupdate.",
+
             data:
                 result.rows[0]
         }
     );
-
 }
 
 
@@ -1392,7 +1524,6 @@ async function deletePenjualan(
                     "Penjualan tidak ditemukan."
             }
         );
-
     }
 
 
@@ -1401,13 +1532,14 @@ async function deletePenjualan(
         200,
         {
             success: true,
+
             message:
                 "Penjualan berhasil dihapus.",
+
             data:
                 result.rows[0]
         }
     );
-
 }
 
 
@@ -1424,13 +1556,11 @@ async function getPembelian(res) {
             ORDER BY id DESC
         `);
 
-
     return sendJSON(
         res,
         200,
         result.rows
     );
-
 }
 
 
@@ -1445,13 +1575,13 @@ async function createPembelian(
 
     const produkId =
         number(
-            body.produk_id ||
+            body.produk_id ??
             body.produkId
         );
 
     const supplierId =
         number(
-            body.supplier_id ||
+            body.supplier_id ??
             body.supplierId
         );
 
@@ -1460,7 +1590,7 @@ async function createPembelian(
 
     const hargaBeli =
         number(
-            body.harga_beli ||
+            body.harga_beli ??
             body.hargaBeli
         );
 
@@ -1486,7 +1616,6 @@ async function createPembelian(
                     "Produk wajib dipilih."
             }
         );
-
     }
 
 
@@ -1501,7 +1630,6 @@ async function createPembelian(
                     "Jumlah pembelian tidak valid."
             }
         );
-
     }
 
 
@@ -1537,13 +1665,14 @@ async function createPembelian(
         201,
         {
             success: true,
+
             message:
                 "Pembelian berhasil disimpan.",
+
             data:
                 result.rows[0]
         }
     );
-
 }
 
 
@@ -1559,13 +1688,13 @@ async function updatePembelian(
 
     const produkId =
         number(
-            body.produk_id ||
+            body.produk_id ??
             body.produkId
         );
 
     const supplierId =
         number(
-            body.supplier_id ||
+            body.supplier_id ??
             body.supplierId
         );
 
@@ -1574,7 +1703,7 @@ async function updatePembelian(
 
     const hargaBeli =
         number(
-            body.harga_beli ||
+            body.harga_beli ??
             body.hargaBeli
         );
 
@@ -1585,7 +1714,8 @@ async function updatePembelian(
 
     const tanggal =
         body.tanggal ||
-        body.tanggal_pembelian;
+        body.tanggal_pembelian ||
+        new Date().toISOString();
 
 
     const result =
@@ -1625,7 +1755,6 @@ async function updatePembelian(
                     "Pembelian tidak ditemukan."
             }
         );
-
     }
 
 
@@ -1634,13 +1763,14 @@ async function updatePembelian(
         200,
         {
             success: true,
+
             message:
                 "Pembelian berhasil diupdate.",
+
             data:
                 result.rows[0]
         }
     );
-
 }
 
 
@@ -1671,7 +1801,6 @@ async function deletePembelian(
                     "Pembelian tidak ditemukan."
             }
         );
-
     }
 
 
@@ -1680,13 +1809,14 @@ async function deletePembelian(
         200,
         {
             success: true,
+
             message:
                 "Pembelian berhasil dihapus.",
+
             data:
                 result.rows[0]
         }
     );
-
 }
 
 
@@ -1706,18 +1836,21 @@ async function getDashboard(res) {
         await Promise.all([
 
             pool.query(`
-                SELECT COUNT(*)::int AS total
+                SELECT
+                    COUNT(*)::int AS total
                 FROM produk
             `),
 
             pool.query(`
-                SELECT COUNT(*)::int AS total
+                SELECT
+                    COUNT(*)::int AS total
                 FROM produk
                 WHERE status = 'active'
             `),
 
             pool.query(`
-                SELECT COUNT(*)::int AS total
+                SELECT
+                    COUNT(*)::int AS total
                 FROM supplier
             `),
 
@@ -1746,6 +1879,7 @@ async function getDashboard(res) {
         Number(
             penjualan.rows[0].total
         ) || 0;
+
 
     const totalPembelian =
         Number(
@@ -1783,11 +1917,9 @@ async function getDashboard(res) {
                 profit:
                     totalPenjualan -
                     totalPembelian
-
             }
         }
     );
-
 }
 
 
@@ -1796,22 +1928,19 @@ async function getDashboard(res) {
 // =========================================================
 
 async function getLaporan(
-    req,
+    parsedURL,
     res
 ) {
 
-    const url =
-        new URL(
-            req.url,
-            `http://${req.headers.host || "localhost"}`
+    const dari =
+        parsedURL.searchParams.get(
+            "dari"
         );
 
-
-    const dari =
-        url.searchParams.get("dari");
-
     const sampai =
-        url.searchParams.get("sampai");
+        parsedURL.searchParams.get(
+            "sampai"
+        );
 
 
     let kondisiPenjualan = "";
@@ -1834,7 +1963,6 @@ async function getLaporan(
         paramsPenjualan.push(dari);
 
         paramsPembelian.push(dari);
-
     }
 
 
@@ -1849,7 +1977,6 @@ async function getLaporan(
         paramsPenjualan.push(sampai);
 
         paramsPembelian.push(sampai);
-
     }
 
 
@@ -1897,6 +2024,7 @@ async function getLaporan(
             penjualan.rows[0].total
         ) || 0;
 
+
     const totalPembelian =
         Number(
             pembelian.rows[0].total
@@ -1910,26 +2038,36 @@ async function getLaporan(
             success: true,
 
             filter: {
-                dari: dari || null,
-                sampai: sampai || null
+
+                dari:
+                    dari || null,
+
+                sampai:
+                    sampai || null
             },
 
             data: {
 
                 penjualan: {
+
                     transaksi:
                         Number(
-                            penjualan.rows[0].transaksi
+                            penjualan.rows[0]
+                                .transaksi
                         ),
+
                     total:
                         totalPenjualan
                 },
 
                 pembelian: {
+
                     transaksi:
                         Number(
-                            pembelian.rows[0].transaksi
+                            pembelian.rows[0]
+                                .transaksi
                         ),
+
                     total:
                         totalPembelian
                 },
@@ -1937,178 +2075,9 @@ async function getLaporan(
                 profit:
                     totalPenjualan -
                     totalPembelian
-
             }
-
         }
     );
-
-}
-
-
-// =========================================================
-// REQUEST BODY
-// =========================================================
-
-function getRequestBody(req) {
-
-    return new Promise(
-        (resolve, reject) => {
-
-            let body = "";
-
-
-            req.on(
-                "data",
-                chunk => {
-
-                    body += chunk;
-
-
-                    if (
-                        body.length >
-                        1024 * 1024
-                    ) {
-
-                        reject(
-                            new Error(
-                                "Request terlalu besar."
-                            )
-                        );
-
-                        req.destroy();
-
-                    }
-
-                }
-            );
-
-
-            req.on(
-                "end",
-                () => {
-
-                    try {
-
-                        if (
-                            !body.trim()
-                        ) {
-
-                            resolve({});
-
-                            return;
-
-                        }
-
-
-                        const data =
-                            JSON.parse(body);
-
-
-                        resolve(data);
-
-                    }
-
-                    catch (error) {
-
-                        reject(
-                            new Error(
-                                "JSON request tidak valid."
-                            )
-                        );
-
-                    }
-
-                }
-            );
-
-
-            req.on(
-                "error",
-                error => {
-
-                    reject(error);
-
-                }
-            );
-
-        }
-    );
-
-}
-
-
-// =========================================================
-// CLEAN STRING
-// =========================================================
-
-function clean(value) {
-
-    if (
-        value === undefined ||
-        value === null
-    ) {
-
-        return "";
-
-    }
-
-
-    return String(value).trim();
-
-}
-
-
-// =========================================================
-// NUMBER
-// =========================================================
-
-function number(value) {
-
-    const n =
-        Number(value);
-
-
-    if (
-        !Number.isFinite(n)
-    ) {
-
-        return 0;
-
-    }
-
-
-    return n;
-
-}
-
-
-// =========================================================
-// JSON RESPONSE
-// =========================================================
-
-function sendJSON(
-    res,
-    status,
-    data
-) {
-
-    res.writeHead(
-        status,
-        {
-            "Content-Type":
-                "application/json; charset=utf-8",
-
-            "Cache-Control":
-                "no-store"
-        }
-    );
-
-
-    res.end(
-        JSON.stringify(data)
-    );
-
 }
 
 
@@ -2139,9 +2108,7 @@ async function testDatabase() {
             "DATABASE ERROR:",
             error.message
         );
-
     }
-
 }
 
 
@@ -2199,15 +2166,13 @@ GET /api/laporan
 ==================================================
         `);
 
-
         testDatabase();
-
     }
 );
 
 
 // =========================================================
-// DATABASE ERROR
+// DATABASE POOL ERROR
 // =========================================================
 
 pool.on(
@@ -2218,7 +2183,6 @@ pool.on(
             "DATABASE POOL ERROR:",
             error.message
         );
-
     }
 );
 
@@ -2237,13 +2201,24 @@ async function shutdown() {
     server.close(
         async () => {
 
-            await pool.end();
+            try {
+
+                await pool.end();
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "POOL CLOSE ERROR:",
+                    error.message
+                );
+            }
+
 
             process.exit(0);
-
         }
     );
-
 }
 
 
@@ -2251,6 +2226,7 @@ process.on(
     "SIGTERM",
     shutdown
 );
+
 
 process.on(
     "SIGINT",
